@@ -7,9 +7,9 @@
 typedef enum {
 	LOG_DEBUG,
 	LOG_ERROR,
-	LOG_WARNING,
+	LOG_WARNING
 } logLevel_t;
 
-void		Com_Printf(logLevel_t level, const char *format, ...);
+void		Com_Printf(logLevel_t, const char* format, ...);
 
 #endif

@@ -1,7 +1,5 @@
 #include "r_local.h"
 
-#include "qcommon.h"
-
 typedef struct {
 	GLuint		id;
 

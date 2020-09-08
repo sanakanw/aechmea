@@ -12,6 +12,8 @@
 
 #define GLEW_STATIC
 
+#include "common.h"
+
 #include <GL/glew.h>
 
 typedef char	r_mesh_t;

@@ -1,59 +1,49 @@
 #include "m_local.h"
 
-#include "qcommon.h"
+#include "common.h"
 
 #include <string.h>
 
-typedef struct {
-	char*	block;
-	char*	ptr;
-	char*	end;
-	
-	int		used;
-	int		size;
-} memhunk_t;
+void Hunk_Init(memhunk_t* hunk, int size) {
+	hunk->used = 0;
+	hunk->size = size;
 
-static memhunk_t hunk;
-
-void Hunk_Init(int size) {
-	hunk.used = 0;
-	hunk.size = size;
-
-	hunk.block	= malloc(size);
-	hunk.ptr	= hunk.block;
-	hunk.end	= hunk.block + size;
+	hunk->block	= malloc(size);
+	hunk->ptr	= hunk->block;
+	hunk->end	= hunk->block + size;
 }
 
-void Hunk_Reset(void* pointer) {
+void Hunk_Reset(memhunk_t* hunk, void* pointer) {
 	char* ptr = (char*) pointer;
 
-	if (ptr < hunk.block || ptr > hunk.end)
+	if (ptr < hunk->block || ptr > hunk->end)
 		Com_Printf(LOG_ERROR, "Hunk reset out of bounds.");
 
-	hunk.ptr = ptr;
+	hunk->ptr = ptr;
 }
 
-void* Hunk_Alloc(int size) {
-	void* ptr = (void*) hunk.ptr;
+void* Hunk_Alloc(memhunk_t* hunk, int size) {
+	void* ptr = (void*) hunk->ptr;
 
-	hunk.used += size;
+	hunk->used += size;
 
-	if ((hunk.ptr += size) > hunk.end)
-		Com_Printf(LOG_ERROR, "Could not allocate to hunk. %i / %i", hunk.used, hunk.size);
+	if ((hunk->ptr += size) > hunk->end)
+		Com_Printf(LOG_ERROR, "Could not allocate to hunk. %i / %i", hunk->used, hunk->size);
 	
 	return ptr;
 }
 
-void* Hunk_Pointer() {
-	return (void*) hunk.ptr;
-}
+pool_t* Hunk_Alloc_Pool(memhunk_t* hunk, int size, int block_size) {
+	int jmp = size * sizeof(int);
+	int blk = size * block_size;
 
-void Hunk_Alloc_Pool(pool_t** pool, int size) {
-	int jmp_size = size * sizeof(int);
-
-	*pool = Hunk_Alloc(sizeof(pool_t) + jmp_size);
-		(*pool)->jmp	= (int*) pool + sizeof(pool_t);
-		(*pool)->size	= size;
-		(*pool)->length	= 0;
-		(*pool)->ptr	= 0;
+	pool_t* pool = Hunk_Alloc(hunk, sizeof(pool_t) + jmp + blk);
+		pool->jmp		= (int*) (pool + 1);
+		pool->blk		= (char*) (pool->jmp + size);
+		pool->blksz		= block_size;
+		pool->size		= size;
+		pool->length	= 0;
+		pool->ptr		= 0;
+	
+	return pool;
 }

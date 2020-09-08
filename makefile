@@ -2,10 +2,10 @@
 default: build run
 
 build:
-	gcc -lglfw -lGL -lGLEW -lm src/*.c
+	gcc -lglfw -lGL -lGLEW -lm src/*.c -o bin/loli
 
 clean:
 	rm -r ./a.out
 
 run:
-	./a.out
+	./bin/loli

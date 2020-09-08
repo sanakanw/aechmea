@@ -1,6 +1,6 @@
 #include "win_local.h"
 
-#include "qcommon.h"
+#include "common.h"
 
 #include "in_local.h"
 
@@ -8,31 +8,44 @@
 
 GLFWwindow* window;
 
-float		xmouse = 0;
-float		ymouse = 0;
+float mouse_pos[2];
 
-void key_callback(GLFWwindow* window, int key, int scan, int action, int mods) {
-	switch (action) {
+void Keyboard_Callback(GLFWwindow* window, int key, int scan, int action, int mods) {
+	
+	inEvent_t event;
+	
+	switch(action) {
 		case GLFW_PRESS:
-			In_QueueEvent(IN_KEYDOWN, key, 0, 0, 0);
-
+			event.type		= IN_KEYDOWN;
+			event.kbutton	= key;
+			
+			In_QueueEvent(event);
+			
 			break;
-
+		
 		case GLFW_RELEASE:
-			In_QueueEvent(IN_KEYUP, key, 0, 0, 0);
-
+			event.type		= IN_KEYUP;
+			event.kbutton	= key;
+			
+			In_QueueEvent(event);
+			
 			break;
 	}
 }
 
-void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
-	float dx = xpos - xmouse;
-	float dy = ypos - ymouse;
+void Mousemove_Callback(GLFWwindow* window, double xpos, double ypos) {
+	float dx = xpos - mouse_pos[0];
+	float dy = ypos - mouse_pos[1];
 	
-	xmouse = xpos;
-	ymouse = ypos;
+	mouse_pos[0] = xpos;
+	mouse_pos[1] = ypos;
 	
-	In_QueueEvent(IN_MOUSEMOVE, 0, 0, dx, dy);
+	inEvent_t event;
+		event.type		= IN_MOUSEMOVE;
+		event.mpos[0]	= dx;
+		event.mpos[1]	= dy;
+	
+	In_QueueEvent(event);
 }
 
 void Win_Init(int width, int height, const char* title) {
@@ -48,17 +61,17 @@ void Win_Init(int width, int height, const char* title) {
 	glfwMakeContextCurrent(window);
 }
 
-void Win_Cursor_Disable() {
+void Win_Cursor_Disable(void) {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
-void Win_Poll() {
+void Win_Poll(void) {
 	glfwPollEvents();
 }
 
-void Win_In_Init() {
-	glfwSetKeyCallback(window, key_callback);
-	glfwSetCursorPosCallback(window, cursor_callback);
+void Win_Input_Init(void) {
+	glfwSetKeyCallback(window, Keyboard_Callback);
+	glfwSetCursorPosCallback(window, Mousemove_Callback);
 }
 
 void Win_Exit() {

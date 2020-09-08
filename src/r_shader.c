@@ -1,7 +1,5 @@
 #include "r_local.h"
 
-#include "qcommon.h"
-
 typedef GLuint	shader_t;
 
 r_shader_t		ptr_shader = 0;

@@ -1,18 +1,18 @@
 #ifndef WIN_LOCAL_H
 #define WIN_LOCAL_H
 
-void	Win_Init(int width, int height, const char* title);
+void			Win_Init(int width, int height, const char* title);
 
-void	Win_Poll(void);
+void			Win_Exit(void);
 
-void	Win_Exit(void);
+float			Win_Time(void);
 
-void	Win_In_Init(void);
+int				Win_Loop(void);
 
-void	Win_Cursor_Disable(void);
+void			Win_Poll(void);
 
-float	Win_Time(void);
+void			Win_Cursor_Disable(void);
 
-int		Win_Loop(void);
+void			Win_Input_Init(void);
 
 #endif

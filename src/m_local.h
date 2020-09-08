@@ -3,24 +3,33 @@
 
 typedef struct {
 	int*	jmp;
+	char*	blk;
+	
+	int		blksz;
+	
 	int		ptr;
 	int		size;
 	int		length;
 } pool_t;
 
-int			Pool_Alloc(pool_t* pool);
+void*		Pool_Alloc(pool_t* pool);
 
-void		Pool_Free(pool_t* pool, int i);
+typedef struct {
+	char*	ptr;
+	char*	end;
+	char*	block;
+	
+	int		size;
+	
+	int		used;
+} memhunk_t;
 
+void		Hunk_Init(memhunk_t* hunk, int size);
 
-void		Hunk_Init(int size);
+void*		Hunk_Alloc(memhunk_t* hunk, int size);
 
-void		Hunk_Reset(void* pointer);
+void		Hunk_Reset(memhunk_t* hunk, void* reset);
 
-void*		Hunk_Alloc(int size);
-
-void*		Hunk_Pointer();
-
-void		Hunk_Alloc_Pool(pool_t** pool, int size);
+pool_t*		Hunk_Pool_Alloc(memhunk_t* hunk, int size, int block_size);
 
 #endif

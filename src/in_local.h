@@ -1,27 +1,30 @@
 #ifndef IN_LOCAL_H
 #define IN_LOCAL_H
 
+#include "win_local.h"
+
 typedef enum {
 	IN_KEYUP,
 	IN_KEYDOWN,
 	IN_MOUSEUP,
 	IN_MOUSEDOWN,
-	IN_MOUSEMOVE
-} eventType_t;
+	IN_MOUSEMOVE,
+} inEventType_t;
 
 typedef struct {
-	eventType_t		type;
+	inEventType_t	type;
 	
 	union {
 		int		kbutton;
 		int		mbutton;
-
 		float	mpos[2];
 	};
-} event_t;
+} inEvent_t;
 
-int			In_Poll(event_t** event);
+void				In_Init(void);
 
-void		In_QueueEvent(eventType_t event, int kbutton, int mbutton, float mousex, float mousey);
+void				In_QueueEvent(inEvent_t event);
+
+int					In_PollEvent(inEvent_t** event);
 
 #endif
