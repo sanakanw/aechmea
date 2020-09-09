@@ -1,21 +1,25 @@
 #include "g_local.h"
 
-void G_Init(game_t* g, gscene_t* s_list) {
-	g->t		= 0;
-	g->f		= 0;
+void G_Init(game_t* g, asset_t* asset, gscene_t* scene_list) {
+	g->t			= 0;
+	g->f			= 0;
 	
-	g->prev		= 0.0f;
-	g->delta	= 0.0f;
+	g->prev			= 0.0f;
+	g->delta		= 0.0f;
+
+	g->asset		= asset;
 	
-	g->s		= NULL;
-	g->s_list	= s_list;
+	g->scene		= NULL;
+	g->scene_list	= scene_list;
 }
 
 void G_Load(game_t* g, int scene) {
-	if (g->s)
-		G_Scene_Free(g->s);
+	if (g->scene)
+		G_Scene_Free(g->scene, g->asset);
 	
-	g->s = &g->s_list[scene];
+	g->scene = &g->scene_list[scene];
+
+	G_Scene_Load(g->scene, g->asset);
 }
 
 void G_Frame(game_t* g, float t) {
@@ -35,14 +39,14 @@ void G_Frame(game_t* g, float t) {
 		}
 		
 		while (In_PollEvent(&g->event))
-			G_Scene_Call(g->s, g->event);
+			G_Scene_Call(g->scene, g->event);
 		
-		G_Scene_Update(g->s, g->t);
+		G_Scene_Update(g->scene, g->t);
 		
 		g->t++;
 	}
 	
-	G_Scene_Render(g->s);
+	G_Scene_Render(g->scene);
 	
 	g->f++;
 }

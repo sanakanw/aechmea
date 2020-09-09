@@ -54,7 +54,7 @@ void Win_Init(int width, int height, const char* title) {
 
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
 	window = glfwCreateWindow(width, height, title, NULL, NULL);
 
