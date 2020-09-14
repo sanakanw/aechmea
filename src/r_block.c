@@ -1,3 +1,5 @@
+#include "render.h"
+
 #include "r_local.h"
 
 typedef GLuint	block_t;
@@ -16,7 +18,7 @@ void R_Add_Block(r_block_t* r_block, int size) {
 	*r_block = ptr_block++;
 }
 
-void R_Block_SubData(r_block_t block, void* data, int offset, int size) {
+void R_Block_Sub_Data(r_block_t block, void* data, int offset, int size) {
 	glBindBuffer(GL_UNIFORM_BUFFER, pool_block[block]);
 	glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
 }

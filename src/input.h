@@ -1,8 +1,6 @@
 #ifndef IN_LOCAL_H
 #define IN_LOCAL_H
 
-#include "win_local.h"
-
 typedef enum {
 	IN_KEYUP,
 	IN_KEYDOWN,

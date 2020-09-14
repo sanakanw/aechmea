@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "g_scene.h"
-#include "in_local.h"
+#include "input.h"
 
 #include "asset.h"
 

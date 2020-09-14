@@ -1,8 +1,7 @@
-#include "win_local.h"
+#include "window.h"
 
+#include "input.h"
 #include "common.h"
-
-#include "in_local.h"
 
 #include <GLFW/glfw3.h>
 
@@ -53,6 +52,7 @@ void Win_Init(int width, int height, const char* title) {
 		Com_Printf(LOG_ERROR, "Failed to initialize GLFW.");
 
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	// glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 

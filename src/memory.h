@@ -28,8 +28,10 @@ void		Hunk_Init(memhunk_t* hunk, int size);
 
 void*		Hunk_Alloc(memhunk_t* hunk, int size);
 
+void*		Hunk_Ptr(memhunk_t* hunk);
+
 void		Hunk_Reset(memhunk_t* hunk, void* reset);
 
-pool_t*		Hunk_Pool_Alloc(memhunk_t* hunk, int size, int block_size);
+void		Hunk_Pool_Alloc(memhunk_t* hunk, pool_t* pool, int stride, int size);
 
 #endif

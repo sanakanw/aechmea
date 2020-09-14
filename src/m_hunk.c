@@ -1,4 +1,4 @@
-#include "m_local.h"
+#include "memory.h"
 
 #include "common.h"
 
@@ -11,6 +11,10 @@ void Hunk_Init(memhunk_t* hunk, int size) {
 	hunk->block	= malloc(size);
 	hunk->ptr	= hunk->block;
 	hunk->end	= hunk->block + size;
+}
+
+void* Hunk_Ptr(memhunk_t* hunk) {
+	return hunk->ptr;
 }
 
 void Hunk_Reset(memhunk_t* hunk, void* pointer) {
@@ -33,17 +37,11 @@ void* Hunk_Alloc(memhunk_t* hunk, int size) {
 	return ptr;
 }
 
-pool_t* Hunk_Alloc_Pool(memhunk_t* hunk, int size, int block_size) {
-	int jmp = size * sizeof(int);
-	int blk = size * block_size;
-
-	pool_t* pool = Hunk_Alloc(hunk, sizeof(pool_t) + jmp + blk);
-		pool->jmp		= (int*) (pool + 1);
-		pool->blk		= (char*) (pool->jmp + size);
-		pool->blksz		= block_size;
-		pool->size		= size;
-		pool->length	= 0;
-		pool->ptr		= 0;
-	
-	return pool;
+void Hunk_Pool_Alloc(memhunk_t* hunk, pool_t* pool, int blksz, int size) {
+	pool->jmp		= Hunk_Alloc(hunk, (sizeof(int) + blksz) * size);
+	pool->blk		= (char*) (pool->jmp + size);
+	pool->blksz		= blksz;
+	pool->size		= size;
+	pool->length	= 0;
+	pool->ptr		= 0;
 }

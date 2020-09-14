@@ -1,4 +1,4 @@
-#include "g_local.h"
+#include "game.h"
 
 void G_Init(game_t* g, asset_t* asset, gscene_t* scene_list) {
 	g->t			= 0;

@@ -1,3 +1,5 @@
+#include "render.h"
+
 #include "r_local.h"
 
 typedef struct {
@@ -51,24 +53,24 @@ void vframe_init(vframe_t* vframe) {
 	
 	offset = offset + VERTEX_ATTRIB_0 * sizeof(float);
 #endif
-
+	
 #ifdef VERTEX_ATTRIB_1
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, VERTEX_ATTRIB_1, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (char*) 0 + offset);
+	glVertexAttribPointer(1, VERTEX_ATTRIB_1, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (float*) 0 + offset);
 	
-	offset = offset + VERTEX_ATTRIB_1 * sizeof(float);
+	offset = offset + VERTEX_ATTRIB_1;
 #endif
 	
 #ifdef VERTEX_ATTRIB_2
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, VERTEX_ATTRIB_2, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (char*) 0 + offset);
+	glVertexAttribPointer(2, VERTEX_ATTRIB_2, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (float*) 0 + offset);
 	
-	offset = offset + VERTEX_ATTRIB_2 * sizeof(float);
+	offset = offset + VERTEX_ATTRIB_2;
 #endif
 
 #ifdef VERTEX_ATTRIB_3
-	glEnableVertexAttribArray(3);tr
-	glVertexAttribPointer(3, VERTEX_ATTRIB_3, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (char*) 0 + offset);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, VERTEX_ATTRIB_3, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (float*) 0 + offset);
 #endif
 
 }

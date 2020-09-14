@@ -1,3 +1,5 @@
+#include "render.h"
+
 #include "r_local.h"
 
 typedef GLuint	shader_t;

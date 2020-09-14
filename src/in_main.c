@@ -1,4 +1,4 @@
-#include "in_local.h"
+#include "input.h"
 
 int			eventHead = 0;
 inEvent_t	eventQueue[32];
