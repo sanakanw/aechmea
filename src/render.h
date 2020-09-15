@@ -2,7 +2,7 @@
 #define RENDER_H
 
 #define INDEX_BUFFER_SIZE	1024
-#define VERTEX_BUFFER_SIZE	16000
+#define VERTEX_BUFFER_SIZE	2048
 
 #define VERTEX_ATTRIB_0		3
 #define VERTEX_ATTRIB_1		3
@@ -19,24 +19,24 @@ typedef char	r_block_t;
 typedef char	r_shader_t;
 typedef char	r_texture_t;
 
-void			R_Init();
+void			r_init();
 
-void			R_Clear();
-void			R_Clear_Color(float r, float g, float b);
+void			r_clear();
+void			r_clear_color(float r, float g, float b);
 
-void			R_Add_Block(r_block_t* block, int size);
-void			R_Add_Shader(r_shader_t* shader, const char* vertex, const char* pixel);
-void			R_Add_Mesh(r_mesh_t* mesh, void* vertex, int vertex_size, void* index, int index_size);
-void			R_Add_Texture(r_texture_t* texture, void* data, int width, int height);
+void			r_add_block(r_block_t* block, int size);
+void			r_add_shader(r_shader_t* shader, const char* vertex, const char* pixel);
+void			r_add_mesh(r_mesh_t* mesh, void* vertex, int vertex_size, void* index, int index_size);
+void			r_add_texture(r_texture_t* texture, void* data, int width, int height);
 
-void			R_Block_Sub_Data(r_block_t block, void* data, int offset, int size);
+void			r_block_sub_data(r_block_t block, void* data, int offset, int size);
 
-void			R_Uniform_Block(r_shader_t shader, const char* name, r_block_t block);
+void			r_uniform_block(r_shader_t shader, const char* name, r_block_t block);
 
-void			R_Bind_Shader(r_shader_t shader);
+void			r_bind_shader(r_shader_t shader);
 
-void			R_Bind_Texture(r_texture_t texture, int sampler);
+void			r_bind_texture(r_texture_t texture, int sampler);
 
-void			R_Draw_Mesh(r_mesh_t mesh);
+void			r_draw_mesh(r_mesh_t mesh);
 
 #endif

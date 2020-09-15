@@ -51,7 +51,7 @@ void vframe_init(vframe_t* vframe) {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, VERTEX_ATTRIB_0, GL_FLOAT, GL_FALSE, VERTEX_SIZE, 0);
 	
-	offset = offset + VERTEX_ATTRIB_0 * sizeof(float);
+	offset = offset + VERTEX_ATTRIB_0;
 #endif
 	
 #ifdef VERTEX_ATTRIB_1
@@ -75,11 +75,11 @@ void vframe_init(vframe_t* vframe) {
 
 }
 
-void R_Init_Buffer() {
+void r_init_buffer() {
 	vframe_init(&vram);
 }
 
-void R_Add_Mesh(r_mesh_t* r_mesh, void* vertex, int vertex_size, void* index, int index_size) {
+void r_add_mesh(r_mesh_t* r_mesh, void* vertex, int vertex_size, void* index, int index_size) {
 	mesh_t* mesh = &pool_mesh[ptr_mesh];
 
 	mesh->vbo		= vram.vertex.ptr;
@@ -114,21 +114,11 @@ void R_Add_Mesh(r_mesh_t* r_mesh, void* vertex, int vertex_size, void* index, in
 	*r_mesh = ptr_mesh++;
 }
 
-void R_Draw_Mesh(r_mesh_t r_mesh) {
+void r_draw_mesh(r_mesh_t r_mesh) {
 	mesh_t* mesh = &pool_mesh[r_mesh];
 
-	if (mesh->sz_ibo) {
-		glDrawElements(
-			GL_TRIANGLES,
-			mesh->sz_ibo,
-			GL_UNSIGNED_INT,
-			(char*) 0+ mesh->ibo
-		);
-	} else {
-		glDrawArrays(
-			GL_TRIANGLES,
-			mesh->vbo,
-			mesh->sz_vbo
-		);
-	}
+	if (mesh->sz_ibo)
+		glDrawElements( GL_TRIANGLES, mesh->sz_ibo, GL_UNSIGNED_INT, (char*) 0 + mesh->ibo );
+	else
+		glDrawArrays( GL_TRIANGLES, mesh->vbo, mesh->sz_vbo );
 }

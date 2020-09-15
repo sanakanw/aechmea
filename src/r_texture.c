@@ -2,10 +2,10 @@
 
 #include "r_local.h"
 
-GLuint		ptr_texture	= 0;
+r_texture_t	ptr_texture	= 0;
 GLuint		pool_texture[32];
 
-void R_Add_Texture(r_texture_t* r_texture, void* data, int width, int height) {
+void r_add_texture(r_texture_t* r_texture, void* data, int width, int height) {
 	glGenTextures(1, &pool_texture[ptr_texture]);
 	glBindTexture(GL_TEXTURE_2D, pool_texture[ptr_texture]);
 	
@@ -22,7 +22,7 @@ void R_Add_Texture(r_texture_t* r_texture, void* data, int width, int height) {
 	*r_texture = ptr_texture++;
 }
 
-void R_Bind_Texture(r_texture_t texture, int i) {
+void r_bind_texture(r_texture_t texture, int i) {
 	glActiveTexture(GL_TEXTURE0 + i);
 	glBindTexture(GL_TEXTURE_2D, pool_texture[texture]);
 }

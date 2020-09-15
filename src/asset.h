@@ -10,22 +10,22 @@ typedef struct {
 typedef struct {
 	float*	vertices;
 	
-	int		count;
-} amesh_t;
+	int		size;
+} asset_mesh_t;
 
 typedef struct {
 	void*	pixels;
 	
 	int		width;
 	int		height;
-} atex_t;
+} asset_tex_t;
 
-void		Asset_Init(asset_t* asset, int mem);
+void				asset_init(asset_t* asset, int mem);
 
-char*		Asset_Load_File(asset_t* asset, const char* path);
+char*				asset_load_file(asset_t* asset, const char* path);
 
-amesh_t*	Asset_Load_Mesh(asset_t* asset, const char* math);
+asset_mesh_t*		asset_load_mesh(asset_t* asset, const char* math);
 
-atex_t*		Asset_Load_Texture(asset_t* asset, const char* path);
+asset_tex_t*		asset_load_texture(asset_t* asset, const char* path);
 
 #endif

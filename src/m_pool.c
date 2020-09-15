@@ -2,12 +2,12 @@
 
 #include <stdio.h>
 
-void* Pool_Alloc(pool_t* pool) {
+void* pool_alloc(pool_t* pool) {
 	pool->length++;
 	
 	int ptr = pool->ptr;
 	
-	pool->ptr += pool->blksz; 
+	pool->ptr += pool->szblk; 
 	
 	return &pool->blk[ptr];
 }

@@ -9,16 +9,16 @@ GLFWwindow* window;
 
 float mouse_pos[2];
 
-void Keyboard_Callback(GLFWwindow* window, int key, int scan, int action, int mods) {
+void keyboard_callback(GLFWwindow* window, int key, int scan, int action, int mods) {
 	
-	inEvent_t event;
+	in_event_t event;
 	
 	switch(action) {
 		case GLFW_PRESS:
 			event.type		= IN_KEYDOWN;
 			event.kbutton	= key;
 			
-			In_QueueEvent(event);
+			in_queue_event(event);
 			
 			break;
 		
@@ -26,28 +26,28 @@ void Keyboard_Callback(GLFWwindow* window, int key, int scan, int action, int mo
 			event.type		= IN_KEYUP;
 			event.kbutton	= key;
 			
-			In_QueueEvent(event);
+			in_queue_event(event);
 			
 			break;
 	}
 }
 
-void Mousemove_Callback(GLFWwindow* window, double xpos, double ypos) {
+void mousemove_callback(GLFWwindow* window, double xpos, double ypos) {
 	float dx = xpos - mouse_pos[0];
 	float dy = ypos - mouse_pos[1];
 	
 	mouse_pos[0] = xpos;
 	mouse_pos[1] = ypos;
 	
-	inEvent_t event;
+	in_event_t event;
 		event.type		= IN_MOUSEMOVE;
 		event.mpos[0]	= dx;
 		event.mpos[1]	= dy;
 	
-	In_QueueEvent(event);
+	in_queue_event(event);
 }
 
-void Win_Init(int width, int height, const char* title) {
+void win_init(int width, int height, const char* title) {
 	if (!glfwInit())
 		Com_Printf(LOG_ERROR, "Failed to initialize GLFW.");
 
@@ -61,30 +61,30 @@ void Win_Init(int width, int height, const char* title) {
 	glfwMakeContextCurrent(window);
 }
 
-void Win_Cursor_Disable(void) {
+void win_cursor_lock(void) {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
-void Win_Poll(void) {
+void win_poll(void) {
 	glfwPollEvents();
 }
 
-void Win_Input_Init(void) {
-	glfwSetKeyCallback(window, Keyboard_Callback);
-	glfwSetCursorPosCallback(window, Mousemove_Callback);
+void win_input_init(void) {
+	glfwSetKeyCallback(window, keyboard_callback);
+	glfwSetCursorPosCallback(window, mousemove_callback);
 }
 
-void Win_Exit() {
+void win_exit() {
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
 
-int Win_Loop() {
+int win_loop() {
 	glfwSwapBuffers(window);
 
 	return !glfwWindowShouldClose(window);
 }
 
-float Win_Time() {
+float win_time() {
 	return glfwGetTime();
 }

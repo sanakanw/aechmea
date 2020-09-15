@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-void Hunk_Init(memhunk_t* hunk, int size) {
+void hunk_init(memhunk_t* hunk, int size) {
 	hunk->used = 0;
 	hunk->size = size;
 
@@ -13,20 +13,22 @@ void Hunk_Init(memhunk_t* hunk, int size) {
 	hunk->end	= hunk->block + size;
 }
 
-void* Hunk_Ptr(memhunk_t* hunk) {
+void* hunk_ptr(memhunk_t* hunk) {
 	return hunk->ptr;
 }
 
-void Hunk_Reset(memhunk_t* hunk, void* pointer) {
+void hunk_reset(memhunk_t* hunk, void* pointer) {
 	char* ptr = (char*) pointer;
 
 	if (ptr < hunk->block || ptr > hunk->end)
 		Com_Printf(LOG_ERROR, "Hunk reset out of bounds.");
-
+	
 	hunk->ptr = ptr;
+	
+	hunk->used = ptr - hunk->block;
 }
 
-void* Hunk_Alloc(memhunk_t* hunk, int size) {
+void* hunk_alloc(memhunk_t* hunk, int size) {
 	void* ptr = (void*) hunk->ptr;
 
 	hunk->used += size;
@@ -37,10 +39,10 @@ void* Hunk_Alloc(memhunk_t* hunk, int size) {
 	return ptr;
 }
 
-void Hunk_Pool_Alloc(memhunk_t* hunk, pool_t* pool, int blksz, int size) {
-	pool->jmp		= Hunk_Alloc(hunk, (sizeof(int) + blksz) * size);
+void hunk_pool_alloc(memhunk_t* hunk, pool_t* pool, int szblk, int size) {
+	pool->jmp		= hunk_alloc(hunk, (sizeof(int) + szblk) * size);
 	pool->blk		= (char*) (pool->jmp + size);
-	pool->blksz		= blksz;
+	pool->szblk		= szblk;
 	pool->size		= size;
 	pool->length	= 0;
 	pool->ptr		= 0;

@@ -1,6 +1,6 @@
-#include "cm_move.h"
+#include "c_move.h"
 
-void CM_Move(ginput_t* input, gentity_t* entity) {
+void g_move(ginput_t* input, gentity_t* entity) {
 	vec3_t v;
 	quat_t q;
 	

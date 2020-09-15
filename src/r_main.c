@@ -2,21 +2,24 @@
 
 #include "r_local.h"
 
-void R_Init() {
+void r_init() {
 	glewExperimental = 1;
 
 	if (glewInit() != GLEW_OK)
 		Com_Printf(LOG_ERROR, "Failed to initialize GLEW.");
 	
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 	
-	R_Init_Buffer();
+	glCullFace(GL_FRONT);
+	
+	r_init_buffer();
 }
 
-void R_Clear() {
+void r_clear() {
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 }
 
-void R_Clear_Color(float r, float g, float b) {
+void r_clear_color(float r, float g, float b) {
 	glClearColor(r, g, b, 1.0);
 }

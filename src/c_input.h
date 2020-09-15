@@ -1,5 +1,5 @@
-#ifndef CM_INPUT_H
-#define CM_INPUT_H
+#ifndef C_INPUT_H
+#define C_INPUT_H
 
 #include "game.h"
 
@@ -10,6 +10,6 @@ typedef struct {
 	float	pitch;
 } ginput_t;
 
-void CM_Input_Event(ginput_t* input, inEvent_t* event);
+void g_input_event(ginput_t* input, in_event_t* event);
 
 #endif

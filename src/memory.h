@@ -1,18 +1,21 @@
 #ifndef M_LOCAL_H
 #define M_LOCAL_H
 
+#define kb(x) x * 1024
+#define mb(x) x * 1024 * 1024
+
 typedef struct {
 	int*	jmp;
 	char*	blk;
 	
-	int		blksz;
+	int		szblk;
 	
 	int		ptr;
 	int		size;
 	int		length;
 } pool_t;
 
-void*		Pool_Alloc(pool_t* pool);
+void*		pool_alloc(pool_t* pool);
 
 typedef struct {
 	char*	ptr;
@@ -24,14 +27,14 @@ typedef struct {
 	int		used;
 } memhunk_t;
 
-void		Hunk_Init(memhunk_t* hunk, int size);
+void		hunk_init(memhunk_t* hunk, int size);
 
-void*		Hunk_Alloc(memhunk_t* hunk, int size);
+void*		hunk_alloc(memhunk_t* hunk, int size);
 
-void*		Hunk_Ptr(memhunk_t* hunk);
+void*		hunk_ptr(memhunk_t* hunk);
 
-void		Hunk_Reset(memhunk_t* hunk, void* reset);
+void		hunk_reset(memhunk_t* hunk, void* reset);
 
-void		Hunk_Pool_Alloc(memhunk_t* hunk, pool_t* pool, int stride, int size);
+void		hunk_pool_alloc(memhunk_t* hunk, pool_t* pool, int szblk, int size);
 
 #endif

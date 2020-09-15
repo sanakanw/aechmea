@@ -1,6 +1,6 @@
 #include "game.h"
 
-void G_Init(game_t* g, asset_t* asset, gscene_t* scene_list) {
+void g_init(game_t* g, asset_t* asset, gscene_t* scene_list) {
 	g->t			= 0;
 	g->f			= 0;
 	
@@ -13,16 +13,16 @@ void G_Init(game_t* g, asset_t* asset, gscene_t* scene_list) {
 	g->scene_list	= scene_list;
 }
 
-void G_Load(game_t* g, int scene) {
+void g_load(game_t* g, int scene) {
 	if (g->scene)
-		G_Scene_Free(g->scene, g->asset);
+		g_scene_free(g->scene, g->asset);
 	
 	g->scene = &g->scene_list[scene];
 
-	G_Scene_Load(g->scene, g->asset);
+	g_scene_load(g->scene, g->asset);
 }
 
-void G_Frame(game_t* g, float t) {
+void g_frame(game_t* g, float t) {
 	g->current	= t;
 	g->elapsed	= g->current - g->prev;
 	g->prev		= g->current;
@@ -38,15 +38,15 @@ void G_Frame(game_t* g, float t) {
 			g->f = 0;
 		}
 		
-		while (In_PollEvent(&g->event))
-			G_Scene_Call(g->scene, g->event);
+		while (in_poll_event(&g->event))
+			g_scene_call(g->scene, g->event);
 		
-		G_Scene_Update(g->scene, g->t);
+		g_scene_update(g->scene, g->t);
 		
 		g->t++;
 	}
 	
-	G_Scene_Render(g->scene);
+	g_scene_render(g->scene);
 	
 	g->f++;
 }

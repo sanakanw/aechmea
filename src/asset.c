@@ -7,11 +7,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-void Asset_Init(asset_t* asset, int mem) {
-	Hunk_Init(&asset->stack, mem);
+void asset_init(asset_t* asset, int mem) {
+	hunk_init(&asset->stack, mem);
 }
 
-amesh_t* Asset_Load_Mesh(asset_t* asset, const char* path) {
+asset_mesh_t* asset_load_mesh(asset_t* asset, const char* path) {
 	FILE* file = fopen(path, "rb");
 	
 	if (!file) {
@@ -34,16 +34,16 @@ amesh_t* Asset_Load_Mesh(asset_t* asset, const char* path) {
 	float* vertex;
 	float* vertices;
 	
-	int count = 0;
+	int size = 0;
 	
-	float* reset = Hunk_Ptr(&asset->stack);
+	float* reset = hunk_ptr(&asset->stack);
 	
 	while ( (r = fscanf(file, "%s ", op)) != EOF ) {
 		if (strcmp(op, "v") == 0) {
-			pos = Hunk_Ptr(&asset->stack);
+			pos = hunk_ptr(&asset->stack);
 			
 			while (strcmp(op, "v") == 0) {
-				v = Hunk_Alloc(&asset->stack, 3 * sizeof(float));
+				v = hunk_alloc(&asset->stack, 3 * sizeof(float));
 				
 				fscanf(file, "%f %f %f\n", &v[0], &v[1], &v[2]);
 				
@@ -52,10 +52,10 @@ amesh_t* Asset_Load_Mesh(asset_t* asset, const char* path) {
 		}
 		
 		if (strcmp(op, "vt") == 0) {
-			tex = Hunk_Ptr(&asset->stack);
+			tex = hunk_ptr(&asset->stack);
 			
 			while (strcmp(op, "vt") == 0) {
-				vt = Hunk_Alloc(&asset->stack, 2 * sizeof(float));
+				vt = hunk_alloc(&asset->stack, 2 * sizeof(float));
 				
 				fscanf(file, "%f %f\n", &vt[0], &vt[1]);
 				
@@ -64,10 +64,10 @@ amesh_t* Asset_Load_Mesh(asset_t* asset, const char* path) {
 		}
 		
 		if (strcmp(op, "vn") == 0) {
-			normal = Hunk_Ptr(&asset->stack);
+			normal = hunk_ptr(&asset->stack);
 			
 			while (strcmp(op, "vn") == 0) {
-				vn = Hunk_Alloc(&asset->stack, 3 * sizeof(float));
+				vn = hunk_alloc(&asset->stack, 3 * sizeof(float));
 				
 				fscanf(file, "%f %f %f\n", &vn[0], &vn[1], &vn[1]);
 				
@@ -76,11 +76,11 @@ amesh_t* Asset_Load_Mesh(asset_t* asset, const char* path) {
 		}
 		
 		if (strcmp(op, "f") == 0) {
-			vertices = Hunk_Ptr(&asset->stack);
+			vertices = hunk_ptr(&asset->stack);
 			
 			while (strcmp(op, "f") == 0) {
 				for (int i = 0; i < 3; i++) {
-					vertex = Hunk_Alloc(&asset->stack, 32);
+					vertex = hunk_alloc(&asset->stack, 32);
 					
 					int f[3];
 					
@@ -94,7 +94,7 @@ amesh_t* Asset_Load_Mesh(asset_t* asset, const char* path) {
 					memcpy(vertex + 3, &normal[ivn], 12);
 					memcpy(vertex + 6, &tex[ivt], 8);
 					
-					count++;
+					size++;
 					
 					r = fgetc(file);
 				}
@@ -112,20 +112,21 @@ amesh_t* Asset_Load_Mesh(asset_t* asset, const char* path) {
 	
 	fclose(file);
 	
-	memcpy(reset, vertices, count * 32);
+	memcpy(reset, vertices, size * 32);
 	
-	Hunk_Reset(&asset->stack, reset);
+	hunk_reset(&asset->stack, reset);
 	
-	Hunk_Alloc(&asset->stack, 32 * count);
+	hunk_alloc(&asset->stack, size * 32);
 	
-	amesh_t* mesh = Hunk_Alloc(&asset->stack, sizeof(amesh_t));
+	asset_mesh_t* mesh = hunk_alloc(&asset->stack, sizeof(asset_mesh_t));
 		mesh->vertices		= reset;
-		mesh->count			= count;
+		mesh->size			= size;
+	
 	
 	return mesh;
 }
 
-atex_t* Asset_Load_Texture(asset_t* asset, const char* path) {
+asset_tex_t* asset_load_texture(asset_t* asset, const char* path) {
 	unsigned char* data;
 	unsigned int width, height;
 	
@@ -136,10 +137,10 @@ atex_t* Asset_Load_Texture(asset_t* asset, const char* path) {
 	}
 	
 	int size = width * height * sizeof(int);
+
+	asset_tex_t* tex = hunk_alloc(&asset->stack, sizeof(asset_tex_t));
 	
-	atex_t* tex = Hunk_Alloc(&asset->stack, sizeof(atex_t));
-	
-	tex->pixels = Hunk_Alloc(&asset->stack, size);
+	tex->pixels = hunk_alloc(&asset->stack, size);
 	tex->width	= width;
 	tex->height	= height;
 	
@@ -150,7 +151,7 @@ atex_t* Asset_Load_Texture(asset_t* asset, const char* path) {
 	return tex;
 }
 
-char* Asset_Load_File(asset_t* asset, const char* path) {
+char* asset_load_file(asset_t* asset, const char* path) {
 	FILE* fs = fopen(path, "rb");
 
 	if (!fs)
@@ -161,7 +162,7 @@ char* Asset_Load_File(asset_t* asset, const char* path) {
 
 	fseek(fs, 0L, SEEK_SET);
 
-	char* content = Hunk_Alloc(&asset->stack, length + 1);
+	char* content = hunk_alloc(&asset->stack, length + 1);
 	fread(content, 1, length, fs);
 	
 	content[length] = '\0';

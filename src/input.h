@@ -7,22 +7,22 @@ typedef enum {
 	IN_MOUSEUP,
 	IN_MOUSEDOWN,
 	IN_MOUSEMOVE,
-} inEventType_t;
+} in_type_t;
 
 typedef struct {
-	inEventType_t	type;
+	in_type_t type;
 	
 	union {
 		int		kbutton;
 		int		mbutton;
 		float	mpos[2];
 	};
-} inEvent_t;
+} in_event_t;
 
-void				In_Init(void);
+void				in_init(void);
 
-void				In_QueueEvent(inEvent_t event);
+void				in_queue_event(in_event_t event);
 
-int					In_PollEvent(inEvent_t** event);
+int					in_poll_event(in_event_t** event);
 
 #endif

@@ -1,17 +1,17 @@
 #include "input.h"
 
-int			eventHead = 0;
-inEvent_t	eventQueue[32];
+int			event_head = 0;
+in_event_t	event_queue[32];
 
-void In_QueueEvent(inEvent_t event) {
-	eventQueue[eventHead++] = event;
+void in_queue_event(in_event_t event) {
+	event_queue[event_head++] = event;
 }
 
-int In_PollEvent(inEvent_t** event) {
-	int remaining = eventHead;
+int in_poll_event(in_event_t** event) {
+	int remaining = event_head;
 	
-	if (eventHead > 0)
-		*event = &eventQueue[--eventHead];
+	if (event_head > 0)
+		*event = &event_queue[--event_head];
 	
 	return remaining;
 }

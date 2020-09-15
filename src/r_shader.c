@@ -7,17 +7,17 @@ typedef GLuint	shader_t;
 r_shader_t		ptr_shader = 0;
 shader_t		pool_shader[32];
 
-void R_Uniform_Block(r_shader_t shader, const char* name, r_block_t block) {
+void r_uniform_block(r_shader_t shader, const char* name, r_block_t block) {
 	GLuint location = glGetUniformBlockIndex(pool_shader[shader], name);
 
 	glUniformBlockBinding(pool_shader[shader], location, block);
 }
 
-void R_Bind_Shader(r_shader_t shader) {
+void r_bind_shader(r_shader_t shader) {
 	glUseProgram(pool_shader[shader]);
 }
 
-void R_Add_Shader(r_shader_t* shader, const char* vertex, const char* pixel) {
+void r_add_shader(r_shader_t* shader, const char* vertex, const char* pixel) {
 	int		success;
 	char	infolog[1024];
 

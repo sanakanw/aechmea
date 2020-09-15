@@ -3,6 +3,6 @@
 
 #include <GL/glew.h>
 
-void			R_Init_Buffer();
+void			r_init_buffer();
 
 #endif

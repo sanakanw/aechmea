@@ -23,13 +23,13 @@ typedef struct {
 	gscene_t*	scene;
 	gscene_t*	scene_list;
 	
-	inEvent_t*	event;
+	in_event_t*	event;
 } game_t;
 
-void	G_Init(game_t* g, asset_t* asset, gscene_t* scene_list);
+void	g_init(game_t* g, asset_t* asset, gscene_t* scene_list);
 
-void	G_Load(game_t* g, int scene);
+void	g_load(game_t* g, int scene);
 
-void	G_Frame(game_t* g, float t);
+void	g_frame(game_t* g, float t);
 
 #endif

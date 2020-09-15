@@ -1,11 +1,11 @@
-#include "cm_camera.h"
+#include "c_camera.h"
 
-void CM_Camera_Init(gcamera_t* cam) {
+void g_camera_init(gcamera_t* cam) {
 	Vec3_Init(cam->pos);
 	Quat_Init(cam->rot);
 }
 
-void CM_Camera_Update(gcamera_t* cam) {
+void g_camera_update(gcamera_t* cam) {
 	mat4_t m;
 	vec3_t v;
 	quat_t q;

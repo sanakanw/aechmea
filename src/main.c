@@ -6,128 +6,66 @@
 
 #include "asset.h"
 
-#include "cm_move.h"
-#include "cm_input.h"
-#include "cm_camera.h"
+#include "c_move.h"
+#include "c_input.h"
+#include "c_camera.h"
+#include "c_render.h"
 
 typedef struct {
-	mat4_t		m;
+	gphys_t		phys;
+	grender_t	render;
 	
-	r_mesh_t	mesh;
-	
-	gentity_t*	entity;
-} grender_t;
-
-typedef struct {
-	mat4_t		v;
-	mat4_t		p;
-	
-	pool_t		pool;
-	
-	r_block_t	block;
-} CM_Render;
-
-void CM_Render_Alloc_Pool(CM_Render* render, memhunk_t* hunk, int size) {
-	Hunk_Pool_Alloc(hunk, &render->pool, size, sizeof(grender_t));
-}
-
-grender_t* CM_Render_Add(CM_Render* render, gentity_t* entity) {
-	grender_t* r = Pool_Alloc(&render->pool);
-		r->entity = entity;
-	
-	return r;
-}
-
-void CM_Render_Update(CM_Render* cm_render, mat4_t cam) {
-	mat4_t m;
-	
-	gentity_t* entity;
-	grender_t* render;
-	
-	for (int i = 0; i < cm_render->pool.length; i++) {
-		render = &((grender_t*) cm_render->pool.blk)[i];
-		entity = render->entity;
-		
-		Mat4_Copy(cam, render->m);
-		
-		Mat4_Translate(m, entity->pos);
-		Mat4_Mul(render->m, m, render->m);
-		
-		Mat4_Rotate(m, entity->rot);
-		Mat4_Mul(render->m, m, render->m);
-		
-		Mat4_Scale(m, entity->scale);
-		Mat4_Mul(render->m, m, render->m);
-	}
-}
-
-void CM_Render_Render(CM_Render* cm_render) {
-	grender_t* grender;
-	
-	for (int i = 0; i < cm_render->pool.length; i++) {
-		grender = &((grender_t*) cm_render->pool.blk)[i];
-		
-		R_Block_Sub_Data(cm_render->block, grender->m, 0, sizeof(mat4_t));
-		
-		R_Draw_Mesh(grender->mesh);
-	}
-}
-
-typedef struct {
-	CM_Render	render;
-	
-	gcamera_t	cam;
 	ginput_t	input;
-	
+	gcamera_t	camera;
+
 	gentity_t*	player;
 	gentity_t*	ground;
-	
-	r_texture_t tex;
-	r_mesh_t	mesh;
-	r_block_t	block;
-	r_shader_t	shader;
-} level_t;
+} scene_t;
 
 void game_load(gscene_t* scene, asset_t* asset) {
-	Hunk_Init(&scene->hunk, 2048);
+	char* vertex_shader;
+	char* pixel_shader;
 	
-	level_t* g = scene->d = Hunk_Alloc(&scene->hunk, sizeof(level_t));
+	asset_tex_t* texdata;
+	asset_mesh_t* meshdata;
 	
-	G_Scene_Alloc_Entity_Pool(scene, 8);
+	pixel_shader	= asset_load_file(asset, "asset/shader/shader.pixel");
+	vertex_shader	= asset_load_file(asset, "asset/shader/shader.vertex");
 	
-	CM_Render_Alloc_Pool(&g->render, &scene->hunk, 8);
+	meshdata		= asset_load_mesh(asset, "asset/mesh/untitled.obj");
+	texdata			= asset_load_texture(asset, "asset/tex/wow.png");
 	
-	CM_Camera_Init(&g->cam);
+	r_mesh_t mesh;
+	r_block_t block;
+	r_shader_t shader;
+	r_texture_t texture;
 	
-	Mat4_Perspective(g->cam.p, 640.0f / 480.0f, 1.4, 1.0f, 100.0f);
+	r_add_texture(&texture, texdata->pixels, texdata->width, texdata->height);
+	r_add_mesh(&mesh, meshdata->vertices, meshdata->size, NULL, 0);
+	r_add_block(&block, sizeof(mat4_t));
+	r_add_shader(&shader, vertex_shader, pixel_shader);
 	
-	char* vertex = Asset_Load_File(asset, "asset/shader/shader.vertex");
-	char* pixel = Asset_Load_File(asset, "asset/shader/shader.pixel");
+	r_bind_texture(texture, 0);
+	r_bind_shader(shader);
+	r_uniform_block(shader, "block", block);
 	
-	atex_t* tex = Asset_Load_Texture(asset, "asset/tex/wow.png");
-	amesh_t* mesh = Asset_Load_Mesh(asset, "asset/mesh/untitled.obj");
+	hunk_init(&scene->hunk, kb(8));
 	
-	R_Add_Mesh(&g->mesh, mesh->vertices, mesh->count, NULL, 0);
-	R_Add_Block(&g->block, sizeof(mat4_t));
-	R_Add_Shader(&g->shader, vertex, pixel);
-	R_Add_Texture(&g->tex, tex->pixels, tex->width, tex->height);
+	g_scene_alloc_entity_pool(scene, 16);
 	
-	R_Bind_Texture(g->tex, 0);
-	R_Bind_Shader(g->shader);
+	scene_t* g = scene->d = hunk_alloc(&scene->hunk, sizeof(scene_t));
 	
-	R_Uniform_Block(g->shader, "block", g->block);  
+	mat4_t proj;
+	Mat4_Perspective(g->camera.p, 640.0f / 640.0f, 1.7f, 0.1f, 100.0f);
 	
-	g->render.block = g->block;
+	g_camera_init(&g->camera);
+	g_render_init(&g->render, &scene->hunk, block, 8);
 	
-	g->player = G_Scene_Add_Entity(scene);
+	g->player = g_scene_add_entity(scene);
 	
-	grender_t* r;
-	
-	g->ground = G_Scene_Add_Entity(scene);
-		r = CM_Render_Add(&g->render, g->ground);
-		r->mesh = g->mesh;
-	
-	Vec3_Set(g->ground->pos, 0.0f, 0.0f, 5.0f);
+	g->ground = g_scene_add_entity(scene);
+		g_render_add(&g->render, g->ground, mesh);
+		g->player->pos[2] = 4.0;
 }
 
 void game_unload(gscene_t* scene, asset_t* asset) {
@@ -135,32 +73,33 @@ void game_unload(gscene_t* scene, asset_t* asset) {
 }
 
 void game_render(gscene_t* scene) {
-	level_t* g = scene->d;
+	scene_t* g = scene->d;
 	
-	R_Clear();
+	r_clear();
 	
-	CM_Render_Render(&g->render);
+	g_render_render(&g->render);
 }
 
 void game_update(gscene_t* scene, int t) {
-	level_t* g = scene->d;
+	scene_t* g = scene->d;
 	
-	CM_Move(&g->input, g->player);
-	
-	Vec3_Copy(g->player->pos, g->cam.pos);
-	Quat_Copy(g->player->rot, g->cam.rot);
+	g_move(&g->input, g->player);
 	
 	g->input.yaw = 0.0f;
 	g->input.pitch = 0.0f;
 	
-	CM_Camera_Update(&g->cam);
-	CM_Render_Update(&g->render, g->cam.m);
+	Vec3_Copy(g->player->pos, g->camera.pos);
+	Quat_Copy(g->player->rot, g->camera.rot);
+	
+	g_camera_update(&g->camera);
+	
+	g_render_update(&g->render, g->camera.m);
 }
 
-void game_call(gscene_t* scene, inEvent_t* event) {
-	level_t* g = scene->d;
+void game_call(gscene_t* scene, in_event_t* event) {
+	scene_t* g = scene->d;
 	
-	CM_Input_Event(&g->input, event);
+	g_input_event(&g->input, event);
 }
 
 gscene_t g_scene_list[] = {
@@ -172,32 +111,32 @@ typedef enum {
 } g_scene;
 
 int main(int argc, char* argv[]) {
-	Win_Init(640, 480, "game");
+	win_init(640, 480, "game");
 	
-	Win_Input_Init();
+	win_input_init();
 	
-	Win_Cursor_Disable();
+	win_cursor_lock();
 
 	float t;
 
 	game_t game;
 	asset_t asset;
 	
-	Asset_Init(&asset, 20480);
+	asset_init(&asset, kb(10));
 	
-	R_Init();
+	r_init();
 	
-	G_Init(&game, &asset, g_scene_list);
+	g_init(&game, &asset, g_scene_list);
 
-	G_Load(&game, SCENE_GAME);
+	g_load(&game, SCENE_GAME);
 
-	while ( Win_Loop() ) {
-		t = Win_Time();
+	while ( win_loop() ) {
+		t = win_time();
 		
-		Win_Poll();
+		win_poll();
 		
-		G_Frame(&game, t);
+		g_frame(&game, t);
 	}
 	
-	Win_Exit();
+	win_exit();
 }

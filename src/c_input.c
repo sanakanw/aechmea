@@ -1,6 +1,6 @@
-#include "cm_input.h"
+#include "c_input.h"
 
-void CM_Input_Event(ginput_t* input, inEvent_t* event) {
+void g_input_event(ginput_t* input, in_event_t* event) {
 	switch (event->type) {
 		case IN_KEYUP:
 		case IN_KEYDOWN: {
