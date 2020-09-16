@@ -1,10 +1,11 @@
 #ifndef C_PHYSICS_H
 #define C_PHYSICS_H
 
+#include "game.h"
+
 typedef enum {
 	COLLIDER_AABB,
 	COLLIDER_PLANE,
-	COLLIDER_SPHERE,
 	COLLIDER_CAPSULE
 } cphys_type_t;
 
@@ -21,13 +22,7 @@ typedef struct {
 typedef struct {
 	vec3_t	p;
 	float	r;
-} cphys_sphere_t;
-
-typedef struct {
-	cphys_aabb_t	b;
-	
-	cphys_sphere_t	a;
-	cphys_sphere_t	c;
+	float	h;
 } cphys_capsule_t;
 
 typedef struct {
@@ -36,7 +31,6 @@ typedef struct {
 	union {
 		cphys_aabb_t	aabb;
 		cphys_plane_t	plane;
-		cphys_sphere_t	sphere;
 		cphys_capsule_t	capsule;
 	};
 } cphys_collider_t;
@@ -55,7 +49,7 @@ typedef struct {
 	pool_t	pool_col;
 } gphys_t;
 
-void		g_phys_init(gphys_t* phys, float gravity);
+void		g_phys_init(gphys_t* phys, memhunk_t* hunk, float gravity, int pool_rb, int pool_col);
 
 void		g_phys_simulate(gphys_t* phys, float dt, int iterations);
 

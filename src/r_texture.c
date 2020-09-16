@@ -1,5 +1,3 @@
-#include "render.h"
-
 #include "r_local.h"
 
 r_texture_t	ptr_texture	= 0;

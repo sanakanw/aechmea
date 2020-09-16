@@ -11,6 +11,37 @@ void asset_init(asset_t* asset, int mem) {
 	hunk_init(&asset->stack, mem);
 }
 
+typedef struct {
+	float*	b;
+	
+	int		size;
+	
+	int		ptr;
+} fbuf_t;
+
+void fbuf_init(fbuf_t* fbuf, int size) {
+	fbuf->b = malloc(size * sizeof(float));
+	
+	fbuf->size = size;
+	
+	fbuf->ptr = 0;
+}
+
+void fbuf_free(fbuf_t* fbuf) {
+	free(fbuf->b);
+}
+
+float* fbuf_alloc(fbuf_t* fbuf, int size) {
+	int ptr = fbuf->ptr;
+	
+	fbuf->ptr += size;
+	
+	if (fbuf->ptr >= fbuf->size)
+		fbuf->b = realloc(fbuf->b, (fbuf->size *= 2) * sizeof(float));
+	
+	return &fbuf->b[ptr];
+}
+
 asset_mesh_t* asset_load_mesh(asset_t* asset, const char* path) {
 	FILE* file = fopen(path, "rb");
 	
@@ -20,110 +51,86 @@ asset_mesh_t* asset_load_mesh(asset_t* asset, const char* path) {
 		return NULL;
 	}
 	
-	char	op[8];
-	int		r;
+	char op[8];
+	char line[256];
 	
-	float* v;
-	float* vt;
-	float* vn;
+	fbuf_t v;
+	fbuf_t vn;
+	fbuf_t vt;
 	
+	fbuf_t mesh;
+	
+	fbuf_init(&v, 32);
+	fbuf_init(&vn, 32);
+	fbuf_init(&vt, 32);
+	
+	fbuf_init(&mesh, 32);
+	
+	float* uv;
 	float* pos;
-	float* tex;
 	float* normal;
 	
 	float* vertex;
-	float* vertices;
 	
-	int size = 0;
+	int f_v[3];
+	int f_vn[3];
+	int f_vt[3];
 	
-	float* reset = hunk_ptr(&asset->stack);
-	
-	while ( (r = fscanf(file, "%s ", op)) != EOF ) {
-		if (strcmp(op, "v") == 0) {
-			pos = hunk_ptr(&asset->stack);
+	while (fgets(line, 256, file)) {
+		sscanf(line, "%s", op);
+		
+		if ( strcmp(op, "v") == 0) {
+			pos = fbuf_alloc(&v, 3);
 			
-			while (strcmp(op, "v") == 0) {
-				v = hunk_alloc(&asset->stack, 3 * sizeof(float));
-				
-				fscanf(file, "%f %f %f\n", &v[0], &v[1], &v[2]);
-				
-				fscanf(file, "%s ", op);
-			}
+			sscanf(line, "v %f %f %f", &pos[0], &pos[1], &pos[2]);
 		}
 		
-		if (strcmp(op, "vt") == 0) {
-			tex = hunk_ptr(&asset->stack);
+		if ( strcmp(op, "vn") == 0) {
+			normal = fbuf_alloc(&vn, 3);
 			
-			while (strcmp(op, "vt") == 0) {
-				vt = hunk_alloc(&asset->stack, 2 * sizeof(float));
-				
-				fscanf(file, "%f %f\n", &vt[0], &vt[1]);
-				
-				fscanf(file, "%s ", op);
-			}
+			sscanf(line, "vn %f %f %f", &normal[0], &normal[1], &normal[2]);
 		}
 		
-		if (strcmp(op, "vn") == 0) {
-			normal = hunk_ptr(&asset->stack);
+		if ( strcmp(op, "vt") == 0) {
+			uv = fbuf_alloc(&vt, 2);
 			
-			while (strcmp(op, "vn") == 0) {
-				vn = hunk_alloc(&asset->stack, 3 * sizeof(float));
-				
-				fscanf(file, "%f %f %f\n", &vn[0], &vn[1], &vn[1]);
-				
-				fscanf(file, "%s ", op);
-			}
+			sscanf(line, "vt %f %f %f", &uv[0], &uv[1]);
 		}
 		
-		if (strcmp(op, "f") == 0) {
-			vertices = hunk_ptr(&asset->stack);
+		if ( strcmp(op, "f") == 0) {
+			sscanf(line, "f %i/%i/%i %i/%i/%i %i/%i/%i",
+				&f_v[0], &f_vt[0], &f_vn[0],
+				&f_v[1], &f_vt[1], &f_vn[1],
+				&f_v[2], &f_vt[2], &f_vn[2]
+			);
 			
-			while (strcmp(op, "f") == 0) {
-				for (int i = 0; i < 3; i++) {
-					vertex = hunk_alloc(&asset->stack, 32);
-					
-					int f[3];
-					
-					fscanf(file, "%i/%i/%i", &f[0], &f[1], &f[2]);
-					
-					int iv = (f[0] - 1) * 3;
-					int ivt = (f[1] - 1) * 2;
-					int ivn = (f[2] - 1) * 3;
-					
-					memcpy(vertex, &pos[iv], 12);
-					memcpy(vertex + 3, &normal[ivn], 12);
-					memcpy(vertex + 6, &tex[ivt], 8);
-					
-					size++;
-					
-					r = fgetc(file);
-				}
+			for (int i = 0; i < 3; i++) {
+				vertex = fbuf_alloc(&mesh, 8);
 				
-				r = fscanf(file, "%s ", op);
+				f_v[i]	= (f_v[i] - 1) * 3;
+				f_vn[i]	= (f_vn[i] - 1) * 3;
+				f_vt[i]	= (f_vt[i] - 1) * 2;
 				
-				if (r == EOF)
-					break;
+				memcpy(vertex, &v.b[f_v[i]], 3 * sizeof(float));
+				memcpy(vertex + 3, &vn.b[f_vn[i]], 3 * sizeof(float));
+				memcpy(vertex + 6, &vt.b[f_vt[i]], 2 * sizeof(float));
 			}
 		}
-		
-		while (fgetc(file) != '\n')
-			if (r == EOF) break;
 	}
 	
-	fclose(file);
+	asset_mesh_t* amesh = hunk_alloc(&asset->stack, sizeof(asset_mesh_t));
+		amesh->vertices		= hunk_alloc(&asset->stack, mesh.ptr * sizeof(float));
+		amesh->size			= mesh.ptr / 8;
 	
-	memcpy(reset, vertices, size * 32);
+	memcpy(amesh->vertices, mesh.b, mesh.ptr * sizeof(float));
 	
-	hunk_reset(&asset->stack, reset);
+	fbuf_free(&v);
+	fbuf_free(&vn);
+	fbuf_free(&vt);
+	fbuf_free(&mesh);
 	
-	hunk_alloc(&asset->stack, size * 32);
-	
-	asset_mesh_t* mesh = hunk_alloc(&asset->stack, sizeof(asset_mesh_t));
-		mesh->vertices		= reset;
-		mesh->size			= size;
-	
-	
-	return mesh;
+	return amesh;
+
 }
 
 asset_tex_t* asset_load_texture(asset_t* asset, const char* path) {

@@ -1,5 +1,3 @@
-#include "render.h"
-
 #include "r_local.h"
 
 typedef GLuint	block_t;

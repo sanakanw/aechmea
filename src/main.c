@@ -6,6 +6,7 @@
 
 #include "asset.h"
 
+#include "c_phys.h"
 #include "c_move.h"
 #include "c_input.h"
 #include "c_camera.h"

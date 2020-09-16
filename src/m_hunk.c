@@ -1,8 +1,4 @@
-#include "memory.h"
-
-#include "common.h"
-
-#include <string.h>
+#include "m_local.h"
 
 void hunk_init(memhunk_t* hunk, int size) {
 	hunk->used = 0;
@@ -40,10 +36,8 @@ void* hunk_alloc(memhunk_t* hunk, int size) {
 }
 
 void hunk_pool_alloc(memhunk_t* hunk, pool_t* pool, int szblk, int size) {
-	pool->jmp		= hunk_alloc(hunk, (sizeof(int) + szblk) * size);
-	pool->blk		= (char*) (pool->jmp + size);
-	pool->szblk		= szblk;
-	pool->size		= size;
-	pool->length	= 0;
-	pool->ptr		= 0;
+	int*	jmp	= hunk_alloc(hunk, size * sizeof(int));
+	char*	blk	= hunk_alloc(hunk, size * szblk);
+	
+	pool_init(pool, blk, jmp, szblk, size);
 }

@@ -1,5 +1,5 @@
-#ifndef M_LOCAL_H
-#define M_LOCAL_H
+#ifndef MEMORY_H
+#define MEMORY_H
 
 #define kb(x) x * 1024
 #define mb(x) x * 1024 * 1024
@@ -14,6 +14,8 @@ typedef struct {
 	int		size;
 	int		length;
 } pool_t;
+
+void		pool_init(pool_t* pool, void* blk, int* jmp, int szblk, int size);
 
 void*		pool_alloc(pool_t* pool);
 
