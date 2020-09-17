@@ -25,16 +25,16 @@ void g_render_update(grender_t* render, mat4_t cam) {
 		r = &((crender_t*) render->pool.blk)[i];
 		entity = r->entity;
 		
-		Mat4_Copy(cam, r->m);
+		mat4_copy(cam, r->m);
 		
-		Mat4_Translate(m, entity->pos);
-		Mat4_Mul(r->m, m, r->m);
+		mat4_translate(m, entity->pos);
+		mat4_mul(r->m, m, r->m);
 		
-		Mat4_Rotate(m, entity->rot);
-		Mat4_Mul(r->m, m, r->m);
+		mat4_rotate(m, entity->rot);
+		mat4_mul(r->m, m, r->m);
 		
-		Mat4_Scale(m, entity->scale);
-		Mat4_Mul(r->m, m, r->m);
+		mat4_scale(m, entity->scale);
+		mat4_mul(r->m, m, r->m);
 	}
 }
 

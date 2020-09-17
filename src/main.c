@@ -57,7 +57,7 @@ void game_load(gscene_t* scene, asset_t* asset) {
 	scene_t* g = scene->d = hunk_alloc(&scene->hunk, sizeof(scene_t));
 	
 	mat4_t proj;
-	Mat4_Perspective(g->camera.p, 640.0f / 480.0f, 1.7f, 0.1f, 100.0f);
+	mat4_perspective(g->camera.p, 640.0f / 480.0f, 1.7f, 0.1f, 100.0f);
 	
 	g_camera_init(&g->camera);
 	
@@ -106,8 +106,8 @@ void game_update(gscene_t* scene, int t) {
 	g->input.yaw = 0.0f;
 	g->input.pitch = 0.0f;
 	
-	Vec3_Copy(g->camera.pos, g->player->pos);
-	Quat_Copy(g->camera.rot, g->player->rot);
+	vec3_copy(g->camera.pos, g->player->pos);
+	quat_copy(g->camera.rot, g->player->rot);
 	
 	g_phys_simulate(&g->phys, 1.0f / 60.0f, 1);
 	

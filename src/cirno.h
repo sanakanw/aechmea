@@ -22,70 +22,70 @@ typedef vec_t	quat_t[4];
 
 typedef vec_t	mat4_t[16];
 
-void			Vec3_Init(vec3_t v);
+void			vec3_init(vec3_t v);
 
-void			Vec3_Copy(vec3_t a, vec3_t b);
+void			vec3_copy(vec3_t a, vec3_t b);
 
-void			Vec3_Set(vec3_t v, float x, float y, float z);
+void			vec3_set(vec3_t v, float x, float y, float z);
 
-void			Vec3_Add(vec3_t a, vec3_t b, vec3_t c);
+void			vec3_add(vec3_t a, vec3_t b, vec3_t c);
 
-void			Vec3_Sub(vec3_t a, vec3_t b, vec3_t c);
+void			vec3_sub(vec3_t a, vec3_t b, vec3_t c);
 
-void			Vec3_Mul(vec3_t a, vec3_t b, vec3_t c);
+void			vec3_mul(vec3_t a, vec3_t b, vec3_t c);
 
-void			Vec3_Div(vec3_t a, vec3_t b, vec3_t c);
+void			vec3_div(vec3_t a, vec3_t b, vec3_t c);
 
-void			Vec3_Addf(vec3_t a, float b, vec3_t c);
+void			vec3_addf(vec3_t a, float b, vec3_t c);
 
-void			Vec3_Subf(vec3_t a, float b, vec3_t c);
+void			vec3_subf(vec3_t a, float b, vec3_t c);
 
-void			Vec3_Mulf(vec3_t a, float b, vec3_t c);
+void			vec3_mulf(vec3_t a, float b, vec3_t c);
 
-void			Vec3_Divf(vec3_t a, float b, vec3_t c);
+void			vec3_divf(vec3_t a, float b, vec3_t c);
 
-void			Vec3_Rotate(vec3_t v, quat_t q, vec3_t a);
+void			vec3_rotate(vec3_t v, quat_t q, vec3_t a);
 
-void			Vec3_Normalize(vec3_t v, vec3_t n);
+void			vec3_normalize(vec3_t v, vec3_t n);
 
-vec_t			Vec3_Length(vec3_t v);
-
-
+vec_t			vec3_length(vec3_t v);
 
 
-void			Quat_Init(quat_t q);
-
-void			Quat_Copy(quat_t a, quat_t b);
-
-void			Quat_Set(quat_t q, float x, float y, float z, float w);
-
-void			Quat_Rotate(quat_t q, vec3_t v, float angle);
-
-void			Quat_Mul(quat_t a, quat_t b, quat_t c);
-
-void			Quat_Vec3_Mul(quat_t a, quat_t b, vec3_t c);
-
-void			Quat_Conjugate(quat_t a, quat_t b);
-
-void			Quat_Normalize(quat_t q, quat_t n);
-
-vec_t			Quat_Length(quat_t q);
 
 
-void			Mat4_Printf(mat4_t m);
+void			quat_init(quat_t q);
 
-void			Mat4_Copy(mat4_t a, mat4_t b);
+void			quat_copy(quat_t a, quat_t b);
 
-void			Mat4_Identity(mat4_t m);
+void			quat_set(quat_t q, float x, float y, float z, float w);
 
-void			Mat4_Scale(mat4_t m, vec3_t v);
+void			quat_rotate(quat_t q, vec3_t v, float angle);
 
-void			Mat4_Rotate(mat4_t m, quat_t q);
+void			quat_mul(quat_t a, quat_t b, quat_t c);
 
-void			Mat4_Translate(mat4_t m, vec3_t v);
+void			quat_vec3_mul(quat_t a, quat_t b, vec3_t c);
 
-void			Mat4_Perspective(mat4_t m, float aspect_ratio, float fov, float near, float far);
+void			quat_conjugate(quat_t a, quat_t b);
 
-void			Mat4_Mul(mat4_t a, mat4_t b, mat4_t c);
+void			quat_normalize(quat_t q, quat_t n);
+
+vec_t			quat_length(quat_t q);
+
+
+void			mat4_printf(mat4_t m);
+
+void			mat4_copy(mat4_t a, mat4_t b);
+
+void			mat4_identity(mat4_t m);
+
+void			mat4_scale(mat4_t m, vec3_t v);
+
+void			mat4_rotate(mat4_t m, quat_t q);
+
+void			mat4_translate(mat4_t m, vec3_t v);
+
+void			mat4_perspective(mat4_t m, float aspect_ratio, float fov, float near, float far);
+
+void			mat4_mul(mat4_t a, mat4_t b, mat4_t c);
 
 #endif

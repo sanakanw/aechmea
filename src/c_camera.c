@@ -1,8 +1,8 @@
 #include "c_camera.h"
 
 void g_camera_init(gcamera_t* cam) {
-	Vec3_Init(cam->pos);
-	Quat_Init(cam->rot);
+	vec3_init(cam->pos);
+	quat_init(cam->rot);
 }
 
 void g_camera_update(gcamera_t* cam) {
@@ -10,15 +10,15 @@ void g_camera_update(gcamera_t* cam) {
 	vec3_t v;
 	quat_t q;
 	
-	Mat4_Copy(cam->p, cam->m);
+	mat4_copy(cam->p, cam->m);
 	
-	Quat_Conjugate(cam->rot, q);
+	quat_conjugate(cam->rot, q);
 	
-	Mat4_Rotate(m, q);
-	Mat4_Mul(cam->m, m, cam->m);
+	mat4_rotate(m, q);
+	mat4_mul(cam->m, m, cam->m);
 	
-	Vec3_Mulf(cam->pos, -1, v);
+	vec3_mulf(cam->pos, -1, v);
 	
-	Mat4_Translate(m, v);
-	Mat4_Mul(cam->m, m, cam->m);
+	mat4_translate(m, v);
+	mat4_mul(cam->m, m, cam->m);
 }

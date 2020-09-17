@@ -1,18 +1,21 @@
 #include "c_phys.h"
 
-void g_phys_init(gphys_t* phys, memhunk_t* hunk, float gravity, int pool_rb, int pool_col) {
+void g_phys_init(gphys_t* phys, memhunk_t* hunk, float gravity, int p_rb, int p_col) {
 	phys->gravity = gravity;
 	
-	hunk_pool_alloc(hunk, &phys->p_collider, pool_rb, sizeof(cphys_collider_t));
-	hunk_pool_alloc(hunk, &phys->p_rigidbody, pool_col, sizeof(cphys_t));
+	hunk_pool_alloc(hunk, &phys->p_collider, p_col, sizeof(cphys_collider_t));
+	hunk_pool_alloc(hunk, &phys->p_rigidbody, p_rb, sizeof(cphys_t));
+}
+
+void cphys_collide_collider(cphys_t* rigidbody, cphys_collider_t* collider) {
+	
 }
 
 void g_phys_collide(gphys_t* phys) {
 	cphys_t* cphys;
-	
 
 	for (int i = 0; i < phys->p_rigidbody.length; i++) {
-		cphys = pool_get(phys->p_rigidbody, i);
+		cphys = pool_get(&phys->p_rigidbody, i);
 		
 		for (int j = 0; j < phys->p_collider.length; j++) {
 			// TODO: cphys_collide_collider(i, j);
@@ -34,12 +37,12 @@ void g_phys_integrate(gphys_t* phys, float dt) {
 	for (int i = 0; i < phys->p_rigidbody.length; i++) {
 		cphys = pool_get(&phys->p_rigidbody, i);
 		
-		Vec3_Add(cphys->vel, g, cphys->vel);
+		vec3_add(cphys->vel, g, cphys->vel);
 
-		Vec3_Copy(v, cphys->vel);
-		Vec3_Mulf(v, dt, v);
+		vec3_copy(v, cphys->vel);
+		vec3_mulf(v, dt, v);
 		
-		Vec3_Add(*cphys->pos, v, *cphys->pos);
+		vec3_add(*cphys->pos, v, *cphys->pos);
 	}
 }
 
@@ -60,5 +63,5 @@ cphys_t* g_phys_add_rigidbody(gphys_t* phys, gentity_t* entity, float mass, cphy
 		cphys->entity	= entity;
 		cphys->pos		= &entity->pos;
 		
-		Vec3_Init(cphys->vel);
+		vec3_init(cphys->vel);
 }

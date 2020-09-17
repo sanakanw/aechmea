@@ -26,9 +26,10 @@ void g_scene_alloc_entity_pool(gscene_t* scene, int size) {
 
 gentity_t* g_scene_add_entity(gscene_t* scene) {
 	gentity_t* entity = pool_alloc(&scene->pool);
-		Vec3_Set(entity->scale, 1.0, 1.0, 1.0);
-		Vec3_Init(entity->pos);
-		Quat_Init(entity->rot);
+		vec3_set(entity->scale, 1.0, 1.0, 1.0);
+		
+		vec3_init(entity->pos);
+		quat_init(entity->rot);
 	
 	return entity;
 }
