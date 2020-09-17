@@ -35,9 +35,9 @@ void* hunk_alloc(memhunk_t* hunk, int size) {
 	return ptr;
 }
 
-void hunk_pool_alloc(memhunk_t* hunk, pool_t* pool, int szblk, int size) {
+void hunk_pool_alloc(memhunk_t* hunk, pool_t* pool, int size, int szblk) {
 	int*	jmp	= hunk_alloc(hunk, size * sizeof(int));
 	char*	blk	= hunk_alloc(hunk, size * szblk);
 	
-	pool_init(pool, blk, jmp, szblk, size);
+	pool_init(pool, blk, jmp, size, szblk);
 }

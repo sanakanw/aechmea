@@ -57,16 +57,33 @@ void game_load(gscene_t* scene, asset_t* asset) {
 	scene_t* g = scene->d = hunk_alloc(&scene->hunk, sizeof(scene_t));
 	
 	mat4_t proj;
-	Mat4_Perspective(g->camera.p, 640.0f / 640.0f, 1.7f, 0.1f, 100.0f);
+	Mat4_Perspective(g->camera.p, 640.0f / 480.0f, 1.7f, 0.1f, 100.0f);
 	
 	g_camera_init(&g->camera);
+	
+	g_phys_init(&g->phys, &scene->hunk, 9.18f, 8, 8);
 	g_render_init(&g->render, &scene->hunk, block, 8);
 	
 	g->player = g_scene_add_entity(scene);
+		g->player->pos[1] = 4.0f;
+		g->player->pos[2] = -4.0f;
+
+	vec3_t a = { -0.5f, -0.5f, -0.5f };
+	vec3_t b = {  0.5f,  0.5f,  0.5f };
+	
+	gentity_t* cube = g_scene_add_entity(scene);
+		g_render_add(&g->render, cube, mesh);
+		
+		g_phys_add_rigidbody(&g->phys, cube, 1.0f, g_phys_aabb_init(a, b));
+
+		cube->pos[1] = 4.0f;
 	
 	g->ground = g_scene_add_entity(scene);
 		g_render_add(&g->render, g->ground, mesh);
-		g->player->pos[2] = 4.0;
+		
+		g->ground->scale[0] = 5.0f;
+		g->ground->scale[1] = 0.5f;
+		g->ground->scale[2] = 5.0f;
 }
 
 void game_unload(gscene_t* scene, asset_t* asset) {
@@ -89,8 +106,10 @@ void game_update(gscene_t* scene, int t) {
 	g->input.yaw = 0.0f;
 	g->input.pitch = 0.0f;
 	
-	Vec3_Copy(g->player->pos, g->camera.pos);
-	Quat_Copy(g->player->rot, g->camera.rot);
+	Vec3_Copy(g->camera.pos, g->player->pos);
+	Quat_Copy(g->camera.rot, g->player->rot);
+	
+	g_phys_simulate(&g->phys, 1.0f / 60.0f, 1);
 	
 	g_camera_update(&g->camera);
 	

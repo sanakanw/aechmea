@@ -15,9 +15,11 @@ typedef struct {
 	int		length;
 } pool_t;
 
-void		pool_init(pool_t* pool, void* blk, int* jmp, int szblk, int size);
+void		pool_init(pool_t* pool, void* blk, int* jmp, int size, int szblk);
 
 void*		pool_alloc(pool_t* pool);
+
+void*		pool_get(pool_t* pool, int i);
 
 typedef struct {
 	char*	ptr;
@@ -37,6 +39,6 @@ void*		hunk_ptr(memhunk_t* hunk);
 
 void		hunk_reset(memhunk_t* hunk, void* reset);
 
-void		hunk_pool_alloc(memhunk_t* hunk, pool_t* pool, int szblk, int size);
+void		hunk_pool_alloc(memhunk_t* hunk, pool_t* pool, int size, int sizeblk);
 
 #endif

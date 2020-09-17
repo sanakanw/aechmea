@@ -4,9 +4,9 @@
 #include "game.h"
 
 typedef enum {
-	COLLIDER_AABB,
-	COLLIDER_PLANE,
-	COLLIDER_CAPSULE
+	PHYS_COLLIDER_AABB,
+	PHYS_COLLIDER_PLANE,
+	PHYS_COLLIDER_CAPSULE
 } cphys_type_t;
 
 typedef struct {
@@ -36,23 +36,29 @@ typedef struct {
 } cphys_collider_t;
 
 typedef struct {
-	vec3_t	pos;
-	vec3_t	vel;
+	cphys_collider_t	collider;
 	
-	float	mass;
+	vec3_t*				pos;
+	vec3_t				vel;
+	
+	gentity_t*			entity;
+	
+	float				mass;
 } cphys_t;
 
 typedef struct {
 	float	gravity;
 	
-	pool_t	pool_rb;
-	pool_t	pool_col;
+	pool_t	p_collider;
+	pool_t	p_rigidbody;
 } gphys_t;
 
-void		g_phys_init(gphys_t* phys, memhunk_t* hunk, float gravity, int pool_rb, int pool_col);
+cphys_collider_t		g_phys_aabb_init(vec3_t a, vec3_t b);
 
-void		g_phys_simulate(gphys_t* phys, float dt, int iterations);
+void					g_phys_init(gphys_t* phys, memhunk_t* hunk, float gravity, int pool_rb, int pool_col);
 
-cphys_t*	g_phys_add_rigidbody(gphys_t* phys, cphys_collider_t collider);
+void					g_phys_simulate(gphys_t* phys, float dt, int iterations);
+
+cphys_t*				g_phys_add_rigidbody(gphys_t* phys, gentity_t* entity, float mass, cphys_collider_t col);
 
 #endif

@@ -21,7 +21,7 @@ void g_scene_call(gscene_t* scene, in_event_t* event) {
 }
 
 void g_scene_alloc_entity_pool(gscene_t* scene, int size) {
-	hunk_pool_alloc(&scene->hunk, &scene->pool, sizeof(gentity_t), size);
+	hunk_pool_alloc(&scene->hunk, &scene->pool, size, sizeof(gentity_t));
 }
 
 gentity_t* g_scene_add_entity(gscene_t* scene) {

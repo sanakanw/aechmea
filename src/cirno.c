@@ -8,7 +8,7 @@ void Vec3_Init(vec3_t v) {
 }
 
 void Vec3_Copy(vec3_t a, vec3_t b) {
-	memcpy(b, a, sizeof(vec3_t));
+	memcpy(a, b, sizeof(vec3_t));
 }
 
 void Vec3_Set(vec3_t v, float x, float y, float z) {
@@ -74,7 +74,7 @@ void Vec3_Rotate(vec3_t v, quat_t q, vec3_t a) {
 	Quat_Vec3_Mul(q, v, c);
 	Quat_Mul(c, b, c);
 	
-	Vec3_Copy(c, a);
+	Vec3_Copy(a, c);
 }
 
 void Vec3_Normalize(vec3_t v, vec3_t n) {
@@ -102,7 +102,7 @@ void Quat_Init(quat_t q) {
 }
 
 void Quat_Copy(quat_t a, quat_t b) {
-	memcpy(b, a, sizeof(quat_t));
+	memcpy(a, b, sizeof(quat_t));
 }
 
 void Quat_Set(quat_t v, float x, float y, float z, float w) {
