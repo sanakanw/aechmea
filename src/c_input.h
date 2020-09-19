@@ -10,6 +10,8 @@ typedef struct {
 	float	pitch;
 } ginput_t;
 
+void g_input_init(ginput_t* input);
+
 void g_input_event(ginput_t* input, in_event_t* event);
 
 #endif

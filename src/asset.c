@@ -94,7 +94,7 @@ asset_mesh_t* asset_load_mesh(asset_t* asset, const char* path) {
 		if ( strcmp(op, "vt") == 0) {
 			uv = fbuf_alloc(&vt, 2);
 			
-			sscanf(line, "vt %f %f %f", &uv[0], &uv[1]);
+			sscanf(line, "vt %f %f", &uv[0], &uv[1]);
 		}
 		
 		if ( strcmp(op, "f") == 0) {

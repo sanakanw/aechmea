@@ -43,10 +43,10 @@ void game_load(gscene_t* scene, asset_t* asset) {
 	r_shader_t shader;
 	r_texture_t texture;
 	
-	r_add_texture(&texture, texdata->pixels, texdata->width, texdata->height);
 	r_add_mesh(&mesh, meshdata->vertices, meshdata->size, NULL, 0);
 	r_add_block(&block, sizeof(mat4_t));
 	r_add_shader(&shader, vertex_shader, pixel_shader);
+	r_add_texture(&texture, texdata->pixels, texdata->width, texdata->height);
 	
 	r_bind_texture(texture, 0);
 	r_bind_shader(shader);
@@ -59,15 +59,16 @@ void game_load(gscene_t* scene, asset_t* asset) {
 	scene_t* g = scene->d = hunk_alloc(&scene->hunk, sizeof(scene_t));
 	
 	mat4_t proj;
-	mat4_perspective(g->camera.p, 640.0f / 480.0f, 1.7f, 0.1f, 100.0f);
+	mat4_perspective(g->camera.p, 640.0f / 480.0f, 1.57f, 0.1f, 100.0f);
 	
+	g_input_init(&g->input);
 	g_camera_init(&g->camera);
 	
 	g_phys_init(&g->phys, &scene->hunk, 9.18f, 8, 8);
 	g_render_init(&g->render, &scene->hunk, block, 8);
 	
-	vec3_t a = { -0.5f, -0.5f, -0.5f };
-	vec3_t b = {  0.5f,  0.5f,  0.5f };
+	vec3_t a = { -0.5f, -1.0f, -0.5f };
+	vec3_t b = {  0.5f,  0.0f,  0.5f };
 	
 	g->player = g_scene_add_entity(scene);
 		g_render_add(&g->render, g->player, mesh);

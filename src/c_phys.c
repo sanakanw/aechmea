@@ -119,7 +119,7 @@ void g_phys_integrate(gphys_t* phys, float dt) {
 				vec3_mulf(rb->vel, f, rb->vel);
 			}
 		} else {
-			vec3_mulf(rb->vel, 0.999f, rb->vel);
+			vec3_mulf(rb->vel, 0.9995f, rb->vel);
 		}
 		
 		c_phys_add_force(rb, g);
@@ -153,6 +153,8 @@ cphys_t* g_phys_add_rigidbody(gphys_t* phys, gentity_t* entity, float mass, cphy
 		cphys_move_vtable[cphys->collider.type](&cphys->collider, entity->pos);
 		
 		cphys->mass		= mass;
+	
+	return cphys;
 }
 
 cphys_collider_t* g_phys_add_collider(gphys_t* phys, cphys_collider_t collider) {

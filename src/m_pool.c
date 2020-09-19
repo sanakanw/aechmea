@@ -18,7 +18,7 @@ void* pool_alloc(pool_t* pool) {
 	pool->ptr += pool->szblk;
 
 	if (pool->length >= pool->size) {
-		com_printf(LOG_ERROR, "pool: failed to allocate %i\%i", pool->length, pool->size);
+		com_printf(LOG_ERROR, "pool: failed to allocate %i/%i", pool->length, pool->size);
 
 		return NULL;
 	}

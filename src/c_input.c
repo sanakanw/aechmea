@@ -1,5 +1,9 @@
 #include "c_input.h"
 
+void g_input_init(ginput_t* input) {
+	memset(input, 0, sizeof(ginput_t));
+}
+
 void g_input_event(ginput_t* input, in_event_t* event) {
 	switch (event->type) {
 		case IN_KEYUP:

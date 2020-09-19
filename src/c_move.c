@@ -46,7 +46,10 @@ void g_move(ginput_t* input, gentity_t* entity, cphys_t* rb) {
 
 		vec3_normalize(v, v);
 		
-		g_accelerate(rb, v, 0.2f, 3.0f);
+		float accel = rb->grounded ? 1.0f : 0.5f;
+		float speed = rb->grounded ? 3.0f : 2.0f;
+		
+		g_accelerate(rb, v, accel, speed);
 	}
 	
 	if (rb->grounded && input->axis[1]) {
