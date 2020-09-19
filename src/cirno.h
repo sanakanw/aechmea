@@ -22,6 +22,12 @@ typedef vec_t	quat_t[4];
 
 typedef vec_t	mat4_t[16];
 
+float			lmaxf(float a, float b);
+
+float			lclampf(float c, float a, float b);
+
+void			vec3_printf(vec3_t v);
+
 void			vec3_init(vec3_t v);
 
 void			vec3_copy(vec3_t a, vec3_t b);
@@ -44,6 +50,12 @@ void			vec3_mulf(vec3_t a, float b, vec3_t c);
 
 void			vec3_divf(vec3_t a, float b, vec3_t c);
 
+float			vec3_maxf(vec3_t v);
+
+void			vec3_max(vec3_t a, vec3_t b, vec3_t c);
+
+float			vec3_dot(vec3_t a, vec3_t b);
+
 void			vec3_rotate(vec3_t v, quat_t q, vec3_t a);
 
 void			vec3_normalize(vec3_t v, vec3_t n);
@@ -52,6 +64,7 @@ vec_t			vec3_length(vec3_t v);
 
 
 
+void			quat_printf(quat_t q);
 
 void			quat_init(quat_t q);
 

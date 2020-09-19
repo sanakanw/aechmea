@@ -1,5 +1,51 @@
 #include "c_phys.h"
 
+void (*cphys_collider_vtable[][3])(cphys_intersect_t* d, cphys_collider_t* a, cphys_collider_t* b) = {
+	{
+		c_phys_collide_aabb_aabb,
+		c_phys_collide_aabb_plane,
+		c_phys_collide_aabb_capsule
+	},
+	
+	{
+		c_phys_collide_plane_aabb,
+		c_phys_collide_plane_plane,
+		c_phys_collide_plane_capsule
+	},
+	
+	{
+		c_phys_collide_capsule_aabb,
+		c_phys_collide_capsule_plane,
+		c_phys_collide_capsule_capsule
+	}
+};
+
+void (*cphys_move_vtable[])(cphys_collider_t* c, vec3_t v) = {
+	c_phys_aabb_move,
+	c_phys_plane_move,
+	c_phys_capsule_move
+};
+
+void c_phys_add_force(cphys_t* rb, vec3_t v) {
+	vec3_t m;
+	
+	vec3_divf(v, rb->mass, m);
+	
+	vec3_add(rb->vel, m, rb->vel);
+}
+
+void c_phys_impulse(cphys_t* rb, vec3_t v, float dt) {
+	vec3_t a;
+	
+	c_phys_add_force(rb, v);
+	
+	vec3_mulf(v, dt, a);
+	
+	vec3_add(*rb->pos, a, *rb->pos);
+	
+	cphys_move_vtable[rb->collider.type](&rb->collider, a);
+}
+
 void g_phys_init(gphys_t* phys, memhunk_t* hunk, float gravity, int p_rb, int p_col) {
 	phys->gravity = gravity;
 	
@@ -7,42 +53,82 @@ void g_phys_init(gphys_t* phys, memhunk_t* hunk, float gravity, int p_rb, int p_
 	hunk_pool_alloc(hunk, &phys->p_rigidbody, p_rb, sizeof(cphys_t));
 }
 
-void cphys_collide_collider(cphys_t* rigidbody, cphys_collider_t* collider) {
+void g_phys_collide(gphys_t* phys, float dt) {
+	cphys_t* cphys_a;
+	cphys_t* cphys_b;
 	
-}
-
-void g_phys_collide(gphys_t* phys) {
-	cphys_t* cphys;
-
+	cphys_collider_t* a;
+	cphys_collider_t* b;
+	
+	cphys_intersect_t it;
+	
+	vec3_t v;
+	
 	for (int i = 0; i < phys->p_rigidbody.length; i++) {
-		cphys = pool_get(&phys->p_rigidbody, i);
+		cphys_a = pool_get(&phys->p_rigidbody, i);
+		
+		cphys_a->grounded = 0;
+		
+		a = &cphys_a->collider;
 		
 		for (int j = 0; j < phys->p_collider.length; j++) {
-			// TODO: cphys_collide_collider(i, j);
+			b = pool_get(&phys->p_collider, j);
+			
+			cphys_collider_vtable[a->type][b->type](&it, a, b);
+			
+			if (it.d <= 0) {
+				float b = 10.0f * it.d;
+				float lambda = -(vec3_dot(cphys_a->vel, it.n) + b) / vec3_dot(it.n, it.n);
+				
+				vec3_mulf(it.n, lambda, v);
+				
+				c_phys_impulse(cphys_a, v, dt);
+				
+				cphys_a->grounded = 1;
+			}
 		}
 
 		for (int j = i + 1; j < phys->p_rigidbody.length; j++) {
-			// TODO: c_phys_collide_rigidbody(i, j);
+			cphys_b = pool_get(&phys->p_rigidbody, j);
+			
+			b = &cphys_b->collider;
+			
+			cphys_collider_vtable[a->type][b->type](&it, a, b);
 		}
 	}
 }
 
 void g_phys_integrate(gphys_t* phys, float dt) {
-	cphys_t* cphys;
+	cphys_t* rb;
 	
 	vec3_t v;
 
 	vec3_t g = { 0.0f, -phys->gravity * dt, 0.0f };
 
 	for (int i = 0; i < phys->p_rigidbody.length; i++) {
-		cphys = pool_get(&phys->p_rigidbody, i);
+		rb = pool_get(&phys->p_rigidbody, i);
 		
-		vec3_add(cphys->vel, g, cphys->vel);
-
-		vec3_copy(v, cphys->vel);
-		vec3_mulf(v, dt, v);
+		if (rb->grounded) {
+			float speed = vec3_length(rb->vel);
+						
+			if (speed) {
+				float drop = speed * 5.0f * dt;
+				
+				float f = lmaxf(speed - drop, 0) / speed;
+				
+				vec3_mulf(rb->vel, f, rb->vel);
+			}
+		} else {
+			vec3_mulf(rb->vel, 0.999f, rb->vel);
+		}
 		
-		vec3_add(*cphys->pos, v, *cphys->pos);
+		c_phys_add_force(rb, g);
+		
+		vec3_mulf(rb->vel, dt, v);
+		
+		vec3_add(*rb->pos, v, *rb->pos);
+		
+		cphys_move_vtable[rb->collider.type](&rb->collider, v);
 	}
 }
 
@@ -52,16 +138,27 @@ void g_phys_simulate(gphys_t* phys, float dt, int iterations) {
 	for (int i = 0; i < iterations; i++) {
 		g_phys_integrate(phys, t);
 		
-		g_phys_collide(phys);
+		g_phys_collide(phys, t);
 	}
 }
 
 cphys_t* g_phys_add_rigidbody(gphys_t* phys, gentity_t* entity, float mass, cphys_collider_t collider) {
 	cphys_t* cphys = pool_alloc(&phys->p_rigidbody);
-		cphys->mass		= mass;
 		cphys->collider	= collider;
 		cphys->entity	= entity;
 		cphys->pos		= &entity->pos;
 		
 		vec3_init(cphys->vel);
+		
+		cphys_move_vtable[cphys->collider.type](&cphys->collider, entity->pos);
+		
+		cphys->mass		= mass;
+}
+
+cphys_collider_t* g_phys_add_collider(gphys_t* phys, cphys_collider_t collider) {
+	cphys_collider_t* col = pool_alloc(&phys->p_collider);
+	
+	*col = collider;
+	
+	return col;
 }

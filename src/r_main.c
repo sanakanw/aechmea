@@ -6,7 +6,7 @@ void r_init() {
 	glewExperimental = 1;
 
 	if (glewInit() != GLEW_OK)
-		Com_Printf(LOG_ERROR, "Failed to initialize GLEW.");
+		com_printf(LOG_ERROR, "Failed to initialize GLEW.");
 	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);

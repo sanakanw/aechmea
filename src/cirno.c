@@ -1,7 +1,21 @@
 #include "cirno.h"
 
-#include <stdio.h>
-#include <string.h>
+#include "common.h"
+
+float lmaxf(float a, float b) {
+	return a > b ? a : b;
+}
+
+float lclampf(float c, float a, float b) {
+	if (c < a) c = a;
+	if (c > b) c = b;
+	
+	return c;
+}
+
+void vec3_printf(vec3_t v) {
+	com_printf(LOG_DEBUG, "%f %f %f", v[0], v[1], v[2]);
+}
 
 void vec3_init(vec3_t v) {
 	memset(v, 0, sizeof(vec3_t));
@@ -66,6 +80,24 @@ void vec3_divf(vec3_t a, float b, vec3_t c) {
 	c[2] = a[2] / b;
 }
 
+float vec3_maxf(vec3_t v) {
+	float f = -1024.0f;
+	
+	for (int i = 0; i < 3; i++)
+		f = v[i] > f ? v[i] : f;
+	
+	return f;
+}
+
+void vec3_max(vec3_t a, vec3_t b, vec3_t c) {
+	for (int i = 0; i < 3; i++)
+		c[i] = a[i] > b[i] ? a[i] : b[i];
+}
+
+float vec3_dot(vec3_t a, vec3_t b) {
+	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
 void vec3_rotate(vec3_t v, quat_t q, vec3_t a) {
 	quat_t c;
 	quat_t b;
@@ -94,6 +126,10 @@ vec_t vec3_length(vec3_t v) {
 }
 
 
+
+void quat_printf(quat_t q) {
+	com_printf(LOG_DEBUG, "%f %f %f %f", q[0], q[1], q[2], q[3]);
+}
 
 void quat_init(quat_t q) {
 	memset(q, 0, sizeof(quat_t));

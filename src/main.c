@@ -18,6 +18,8 @@ typedef struct {
 	
 	ginput_t	input;
 	gcamera_t	camera;
+	
+	cphys_t*	pm;
 
 	gentity_t*	player;
 	gentity_t*	ground;
@@ -34,7 +36,7 @@ void game_load(gscene_t* scene, asset_t* asset) {
 	vertex_shader	= asset_load_file(asset, "asset/shader/shader.vertex");
 	
 	meshdata		= asset_load_mesh(asset, "asset/mesh/untitled.obj");
-	texdata			= asset_load_texture(asset, "asset/tex/wow.png");
+	texdata			= asset_load_texture(asset, "asset/tex/stone.png");
 	
 	r_mesh_t mesh;
 	r_block_t block;
@@ -64,26 +66,29 @@ void game_load(gscene_t* scene, asset_t* asset) {
 	g_phys_init(&g->phys, &scene->hunk, 9.18f, 8, 8);
 	g_render_init(&g->render, &scene->hunk, block, 8);
 	
-	g->player = g_scene_add_entity(scene);
-		g->player->pos[1] = 4.0f;
-		g->player->pos[2] = -4.0f;
-
 	vec3_t a = { -0.5f, -0.5f, -0.5f };
 	vec3_t b = {  0.5f,  0.5f,  0.5f };
 	
-	gentity_t* cube = g_scene_add_entity(scene);
-		g_render_add(&g->render, cube, mesh);
-		
-		g_phys_add_rigidbody(&g->phys, cube, 1.0f, g_phys_aabb_init(a, b));
+	g->player = g_scene_add_entity(scene);
+		g_render_add(&g->render, g->player, mesh);
 
-		cube->pos[1] = 4.0f;
+		g->player->pos[1] = 10.0f;
+		
+		g->pm = g_phys_add_rigidbody(&g->phys, g->player, 1.0f, c_phys_aabb_init(a, b));
+	
+	float s = 10.0f;
+	
+	vec3_t a1 = { -s, -0.5f, -s };
+	vec3_t b1 = {  s,  0.5f,  s };
 	
 	g->ground = g_scene_add_entity(scene);
 		g_render_add(&g->render, g->ground, mesh);
 		
-		g->ground->scale[0] = 5.0f;
+		g->ground->scale[0] = s;
 		g->ground->scale[1] = 0.5f;
-		g->ground->scale[2] = 5.0f;
+		g->ground->scale[2] = s;
+		
+		g_phys_add_collider(&g->phys, c_phys_aabb_init(a1, b1));
 }
 
 void game_unload(gscene_t* scene, asset_t* asset) {
@@ -101,7 +106,7 @@ void game_render(gscene_t* scene) {
 void game_update(gscene_t* scene, int t) {
 	scene_t* g = scene->d;
 	
-	g_move(&g->input, g->player);
+	g_move(&g->input, g->player, g->pm);
 	
 	g->input.yaw = 0.0f;
 	g->input.pitch = 0.0f;
@@ -109,7 +114,7 @@ void game_update(gscene_t* scene, int t) {
 	vec3_copy(g->camera.pos, g->player->pos);
 	quat_copy(g->camera.rot, g->player->rot);
 	
-	g_phys_simulate(&g->phys, 1.0f / 60.0f, 1);
+	g_phys_simulate(&g->phys, 1.0f / 60.0f, 5);
 	
 	g_camera_update(&g->camera);
 	
@@ -142,7 +147,7 @@ int main(int argc, char* argv[]) {
 	game_t game;
 	asset_t asset;
 	
-	asset_init(&asset, kb(10));
+	asset_init(&asset, mb(4));
 	
 	r_init();
 	

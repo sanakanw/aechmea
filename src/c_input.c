@@ -7,21 +7,24 @@ void g_input_event(ginput_t* input, in_event_t* event) {
 			float d = 2 * (event->type == IN_KEYDOWN) - 1;
 			
 			switch (event->kbutton) {
-				case 87:
+				case KEY_W:
 					input->axis[2] += d;
 					break;
 				
-				case 83:
+				case KEY_S:
 					input->axis[2] -= d;
 					break;
 				
-				case 68:
+				case KEY_D:
 					input->axis[0] += d;
 					break;
 				
-				case 65:
+				case KEY_A:
 					input->axis[0] -= d;
 					break;
+				
+				case KEY_SPACE:
+					input->axis[1]  = event->type == IN_KEYDOWN;
 			}
 		}; break;
 		

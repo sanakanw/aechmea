@@ -88,7 +88,7 @@ void r_add_mesh(r_mesh_t* r_mesh, void* vertex, int vertex_size, void* index, in
 	vram.vertex.ptr += vertex_size * VERTEX_SIZE;
 	
 	if (vram.vertex.ptr > VERTEX_BUFFER_SIZE)
-		Com_Printf(LOG_ERROR, "failed to allocate to vertex buffer %i/%i", vram.vertex.ptr, VERTEX_BUFFER_SIZE);
+		com_printf(LOG_ERROR, "failed to allocate to vertex buffer %i/%i", vram.vertex.ptr, VERTEX_BUFFER_SIZE);
 	
 	glBufferSubData(GL_ARRAY_BUFFER, ptr_vertex, vertex_size * VERTEX_SIZE, vertex);
 	
@@ -101,7 +101,7 @@ void r_add_mesh(r_mesh_t* r_mesh, void* vertex, int vertex_size, void* index, in
 		vram.index.ptr += index_size * sizeof(int);
 		
 		if (vram.index.ptr > INDEX_BUFFER_SIZE)
-			Com_Printf(LOG_ERROR, "failed to allocate to vertex buffer %i/%i", vram.index.ptr, INDEX_BUFFER_SIZE);
+			com_printf(LOG_ERROR, "failed to allocate to vertex buffer %i/%i", vram.index.ptr, INDEX_BUFFER_SIZE);
 		
 		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, ptr_index, index_size * sizeof(int), index);
 	} else {

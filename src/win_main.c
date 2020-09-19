@@ -49,7 +49,7 @@ void mousemove_callback(GLFWwindow* window, double xpos, double ypos) {
 
 void win_init(int width, int height, const char* title) {
 	if (!glfwInit())
-		Com_Printf(LOG_ERROR, "Failed to initialize GLFW.");
+		com_printf(LOG_ERROR, "Failed to initialize GLFW.");
 
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	// glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);

@@ -7,10 +7,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-void asset_init(asset_t* asset, int mem) {
-	hunk_init(&asset->stack, mem);
-}
-
 typedef struct {
 	float*	b;
 	
@@ -42,11 +38,15 @@ float* fbuf_alloc(fbuf_t* fbuf, int size) {
 	return &fbuf->b[ptr];
 }
 
+void asset_init(asset_t* asset, int mem) {
+	hunk_init(&asset->stack, mem);
+}
+
 asset_mesh_t* asset_load_mesh(asset_t* asset, const char* path) {
 	FILE* file = fopen(path, "rb");
 	
 	if (!file) {
-		Com_Printf(LOG_ERROR, "failed to load file: %s", path);
+		com_printf(LOG_ERROR, "failed to load file: %s", path);
 		
 		return NULL;
 	}
@@ -138,7 +138,7 @@ asset_tex_t* asset_load_texture(asset_t* asset, const char* path) {
 	unsigned int width, height;
 	
 	if (lodepng_decode32_file(&data, &width, &height, path)) {
-		Com_Printf(LOG_ERROR, "Failed to open %s\n", path);
+		com_printf(LOG_ERROR, "Failed to open %s\n", path);
 		
 		return NULL;
 	}
@@ -162,7 +162,7 @@ char* asset_load_file(asset_t* asset, const char* path) {
 	FILE* fs = fopen(path, "rb");
 
 	if (!fs)
-		Com_Printf(LOG_ERROR, "asset: failed to open file %s", path);
+		com_printf(LOG_ERROR, "asset: failed to open file %s", path);
 	
 	fseek(fs, 0L, SEEK_END);
 	long length = ftell(fs);

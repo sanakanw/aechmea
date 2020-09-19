@@ -17,7 +17,7 @@ void hunk_reset(memhunk_t* hunk, void* pointer) {
 	char* ptr = (char*) pointer;
 
 	if (ptr < hunk->block || ptr > hunk->end)
-		Com_Printf(LOG_ERROR, "Hunk reset out of bounds.");
+		com_printf(LOG_ERROR, "Hunk reset out of bounds.");
 	
 	hunk->ptr = ptr;
 	
@@ -30,7 +30,7 @@ void* hunk_alloc(memhunk_t* hunk, int size) {
 	hunk->used += size;
 
 	if ((hunk->ptr += size) > hunk->end)
-		Com_Printf(LOG_ERROR, "Could not allocate to hunk. %i / %i", hunk->used, hunk->size);
+		com_printf(LOG_ERROR, "Could not allocate to hunk. %i / %i", hunk->used, hunk->size);
 	
 	return ptr;
 }

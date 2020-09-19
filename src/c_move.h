@@ -5,6 +5,8 @@
 
 #include "c_input.h"
 
-void g_move(ginput_t* input, gentity_t* entity);
+#include "c_phys.h"
+
+void g_move(ginput_t* input, gentity_t* entity, cphys_t* rigidbody);
 
 #endif

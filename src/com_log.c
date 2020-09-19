@@ -8,7 +8,7 @@ const char* log_level[3] = {
 	"[WARNING] "
 };
 
-void Com_Printf(logLevel_t level, const char* format, ...) {
+void com_printf(logLevel_t level, const char* format, ...) {
 	va_list args;
 	va_start(args, format);
 	

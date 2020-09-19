@@ -30,7 +30,7 @@ void r_add_shader(r_shader_t* shader, const char* vertex, const char* pixel) {
 	if (!success) {
 		glGetShaderInfoLog(vs, 1024, NULL, infolog);
 
-		Com_Printf(LOG_ERROR, "Failed to compile vertex shader:\n%s", infolog);
+		com_printf(LOG_ERROR, "Failed to compile vertex shader:\n%s", infolog);
 	}
 
 	fs = glCreateShader(GL_FRAGMENT_SHADER);
@@ -42,7 +42,7 @@ void r_add_shader(r_shader_t* shader, const char* vertex, const char* pixel) {
 	if (!success) {
 		glGetShaderInfoLog(fs, 1024, NULL, infolog);
 
-		Com_Printf(LOG_ERROR, "Failed to compile pixel shader:\n%s", infolog);
+		com_printf(LOG_ERROR, "Failed to compile pixel shader:\n%s", infolog);
 	}
 
 	shader_t program = pool_shader[ptr_shader] = glCreateProgram();

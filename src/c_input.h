@@ -5,7 +5,7 @@
 
 typedef struct {
 	vec3_t	axis;
-	
+
 	float	yaw;
 	float	pitch;
 } ginput_t;

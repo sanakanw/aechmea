@@ -33,7 +33,7 @@ void g_frame(game_t* g, float t) {
 		g->delta -= FRAME_TIME;
 		
 		if (g->t % 60 == 0) {
-			Com_Printf(LOG_DEBUG, "frames: %i", g->f);
+			com_printf(LOG_DEBUG, "frames: %i", g->f);
 			
 			g->f = 0;
 		}
