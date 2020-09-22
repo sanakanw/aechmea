@@ -5,7 +5,7 @@ typedef GLuint	block_t;
 r_block_t		ptr_block = 0;
 block_t			pool_block[32];
 
-void r_add_block(r_block_t* r_block, int size) {
+r_block_t r_add_block(int size) {
 	glGenBuffers(1, &pool_block[ptr_block]);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, pool_block[ptr_block]);
@@ -13,7 +13,7 @@ void r_add_block(r_block_t* r_block, int size) {
 
 	glBindBufferRange(GL_UNIFORM_BUFFER, ptr_block, pool_block[ptr_block], 0, size);
 
-	*r_block = ptr_block++;
+	return ptr_block++;
 }
 
 void r_block_sub_data(r_block_t block, void* data, int offset, int size) {

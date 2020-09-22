@@ -11,10 +11,10 @@ void			r_init();
 void			r_clear();
 void			r_clear_color(float r, float g, float b);
 
-void			r_add_block(r_block_t* block, int size);
-void			r_add_shader(r_shader_t* shader, const char* vertex, const char* pixel);
-void			r_add_mesh(r_mesh_t* mesh, void* vertex, int vertex_size, void* index, int index_size);
-void			r_add_texture(r_texture_t* texture, void* data, int width, int height);
+r_block_t		r_add_block(int size);
+r_shader_t		r_add_shader(const char* vertex, const char* pixel);
+r_mesh_t		r_add_mesh(float* vertex, int vbufsz);
+r_texture_t		r_add_texture(void* data, int width, int height);
 
 void			r_block_sub_data(r_block_t block, void* data, int offset, int size);
 

@@ -3,7 +3,7 @@
 r_texture_t	ptr_texture	= 0;
 GLuint		pool_texture[32];
 
-void r_add_texture(r_texture_t* r_texture, void* data, int width, int height) {
+r_texture_t r_add_texture(void* data, int width, int height) {
 	glGenTextures(1, &pool_texture[ptr_texture]);
 	glBindTexture(GL_TEXTURE_2D, pool_texture[ptr_texture]);
 	
@@ -17,7 +17,7 @@ void r_add_texture(r_texture_t* r_texture, void* data, int width, int height) {
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
-	*r_texture = ptr_texture++;
+	return ptr_texture++;
 }
 
 void r_bind_texture(r_texture_t texture, int i) {

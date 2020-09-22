@@ -53,10 +53,11 @@ void g_move(ginput_t* input, gentity_t* entity, cphys_t* rb) {
 	}
 	
 	if (rb->grounded && input->axis[1]) {
-		vec3_set(v, 0.0f, 3.0f, 0.0f);
+		vec3_set(v, 0.0f, 3.5f, 0.0f);
 		
 		c_phys_add_force(rb, v);
 		
-		input->axis[1] = 0;
 	}
+	
+	input->axis[1] = 0;
 }

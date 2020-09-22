@@ -15,7 +15,7 @@ void r_bind_shader(r_shader_t shader) {
 	glUseProgram(pool_shader[shader]);
 }
 
-void r_add_shader(r_shader_t* shader, const char* vertex, const char* pixel) {
+r_shader_t r_add_shader(const char* vertex, const char* pixel) {
 	int		success;
 	char	infolog[1024];
 
@@ -58,5 +58,5 @@ void r_add_shader(r_shader_t* shader, const char* vertex, const char* pixel) {
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
-	*shader = ptr_shader++;
+	return ptr_shader++;
 }

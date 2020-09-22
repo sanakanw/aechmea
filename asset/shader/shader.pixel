@@ -1,11 +1,43 @@
 #version 330 core
 
+layout (std140) uniform block {
+	mat4	model;
+	mat4	transform;
+	
+	vec4	light_pos;
+	vec4	view_pos;
+	
+	float	ambience;
+};
+
 in vec2 vs_uv;
+in vec3 vs_normal;
+in vec3 vs_fragpos;
 
 out vec4 frag_color;
 
 uniform sampler2D sampler;
 
 void main() {
-	frag_color = texture2D(sampler, vs_uv);
+	vec3 delta = vec3(light_pos) - vs_fragpos;
+	
+	vec3 lightdir = normalize(delta);
+	
+	vec3 normal = normalize(vs_normal);
+	
+	vec3 viewdir = normalize(vec3(view_pos) - vs_fragpos);
+	vec3 reflectdir = reflect(-lightdir, normal);
+	
+	float intensity = 9.0;
+	
+	float d = max(intensity - length(delta), 0.0) / 7.0 * intensity;
+	float attuenation = d * d * 0.05 + d * 0.02;
+	
+	float diffuse = max(dot(normal, lightdir), 0.0);
+	
+	float specular = pow(max(dot(viewdir, reflectdir), 0.0), 32);
+	
+	float light = ambience + attuenation * (diffuse + 0.5 * specular);
+	
+	frag_color = light * (texture2D(sampler, vs_uv) + 0.1);
 }
