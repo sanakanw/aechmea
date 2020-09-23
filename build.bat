@@ -1,0 +1,2 @@
+cl -D_HAS_EXCEPTIONS=0 /MTd /MP /Fo./bin/win/obj\ /Febin/win/game.exe -I./lib/include opengl32.lib shell32.lib gdi32.lib user32.lib ./lib/bin/x64/*.lib src/*.c /link /NODEFAULTLIB:MSVCRTD.lib /NODEFAULTLIB:LIBCMT.lib
+"bin/win/game.exe"
