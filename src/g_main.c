@@ -39,7 +39,7 @@ void g_frame(game_t* g, float t) {
 		}
 		
 		while (in_poll_event(&g->event))
-			g_scene_call(g->scene, g->event);
+			g_scene_event(g->scene, g->event);
 		
 		g_scene_update(g->scene, g->t);
 		

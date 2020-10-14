@@ -16,8 +16,8 @@ void g_scene_update(gscene_t* scene, int t) {
 	scene->update(scene, t);
 }
 
-void g_scene_call(gscene_t* scene, in_event_t* event) {
-	scene->call(scene, event);
+void g_scene_event(gscene_t* scene, in_event_t* event) {
+	scene->event(scene, event);
 }
 
 void g_scene_alloc_entity_pool(gscene_t* scene, int size) {

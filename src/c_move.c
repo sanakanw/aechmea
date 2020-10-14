@@ -1,6 +1,6 @@
-#include "c_move.h"
+#include "c_local.h"
 
-void g_accelerate(cphys_t* rb, vec3_t wishdir, float accel, float wishspeed) {
+void accelerate(cphys_t* rb, vec3_t wishdir, float accel, float wishspeed) {
 	vec3_t v;
 	
 	float addspeed, accelspeed, currentspeed;
@@ -12,7 +12,7 @@ void g_accelerate(cphys_t* rb, vec3_t wishdir, float accel, float wishspeed) {
 	if (addspeed <= 0)
 		return;
 	
-	accelspeed = accel;
+	accelspeed = accel * wishspeed;
 	
 	if (accelspeed > addspeed)
 		accelspeed = addspeed;
@@ -20,44 +20,41 @@ void g_accelerate(cphys_t* rb, vec3_t wishdir, float accel, float wishspeed) {
 	vec3_mulf(wishdir, accelspeed, v);
 	
 	c_phys_add_force(rb, v);
+
+	float magnitude = vec3_length(rb->vel);
+
+	float max_vel = 8.0f;
+
+	if (magnitude > max_vel) {
+		float cap = 1 - max_vel / magnitude;
+
+		vec3_mulf(rb->vel, -cap, v);
+
+		c_phys_add_force(rb, v);
+	}
+
 }
 
-void g_move(ginput_t* input, gentity_t* entity, cphys_t* rb) {
-	vec3_t v;
-	quat_t q;
-		
-	vec3_set(v, 0, 1, 0);
-	quat_rotate(q, v, 0.005 * input->yaw);
-	
-	quat_mul(q, entity->rot, q);
-	quat_normalize(q, entity->rot);
-	
-	vec3_set(v, 1, 0, 0);
-	vec3_rotate(v, entity->rot,  v);
-	quat_rotate(q, v, 0.005 * input->pitch);
-	
-	quat_mul(q, entity->rot, q);
-	quat_normalize(q, entity->rot);
-	
-	vec3_rotate(input->axis, entity->rot, v);
-	
-	if (input->axis[0] || input->axis[2]) {
+void c_move(gentity_t* p, cphys_t* pm, vec3_t cmd) {
+	if (cmd[0] || cmd[2]) {
+		vec3_t v;
+
+		vec3_rotate(cmd, p->rot, v);
 		v[1] = 0.0f;
 
 		vec3_normalize(v, v);
 		
-		float accel = rb->grounded ? 1.0f : 0.5f;
-		float speed = rb->grounded ? 3.0f : 2.0f;
+		float accel = pm->grounded ? 0.1f : 1.0f;
+		float speed = pm->grounded ? 8.0f : 0.6f;
 		
-		g_accelerate(rb, v, accel, speed);
+		accelerate(pm, v, accel, speed);
 	}
-	
-	if (rb->grounded && input->axis[1]) {
-		vec3_set(v, 0.0f, 3.5f, 0.0f);
-		
-		c_phys_add_force(rb, v);
-		
+
+	if (pm->grounded && cmd[1]) {
+		vec3_t v = { 0.0f, 3.0f, 0.0f };
+
+		c_phys_add_force(pm, v);
+
+		cmd[1] = 0;
 	}
-	
-	input->axis[1] = 0;
 }

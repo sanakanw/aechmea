@@ -3,27 +3,25 @@
 void (*cphys_collider_vtable[][3])(cphys_intersect_t* d, cphys_collider_t* a, cphys_collider_t* b) = {
 	{
 		c_phys_collide_aabb_aabb,
-		c_phys_collide_aabb_plane,
-		c_phys_collide_aabb_capsule
+		c_phys_collide_aabb_map,
+		c_phys_collide_aabb_ground
 	},
-	
 	{
-		c_phys_collide_plane_aabb,
-		c_phys_collide_plane_plane,
-		c_phys_collide_plane_capsule
+		c_phys_collide_map_map,
+		c_phys_collide_map_aabb,
+		c_phys_collide_map_ground
 	},
-	
 	{
-		c_phys_collide_capsule_aabb,
-		c_phys_collide_capsule_plane,
-		c_phys_collide_capsule_capsule
+		c_phys_collide_ground_map,
+		c_phys_collide_ground_aabb,
+		c_phys_collide_ground_ground
 	}
 };
 
 void (*cphys_move_vtable[])(cphys_collider_t* c, vec3_t v) = {
 	c_phys_aabb_move,
-	c_phys_plane_move,
-	c_phys_capsule_move
+	c_phys_map_move,
+	c_phys_ground_move
 };
 
 void c_phys_add_force(cphys_t* rb, vec3_t v) {
@@ -76,12 +74,12 @@ void g_phys_collide(gphys_t* phys, float dt) {
 			
 			cphys_collider_vtable[a->type][b->type](&it, a, b);
 			
-			if (it.d <= 0) {
+			if (it.d < 0 && vec3_length(it.n) != 0) {
 				float b = 10.0f * it.d;
 				float lambda = -(vec3_dot(cphys_a->vel, it.n) + b) / vec3_dot(it.n, it.n);
 				
 				vec3_mulf(it.n, lambda, v);
-				
+
 				c_phys_impulse(cphys_a, v, dt);
 				
 				cphys_a->grounded = 1;
@@ -108,18 +106,16 @@ void g_phys_integrate(gphys_t* phys, float dt) {
 	for (int i = 0; i < phys->p_rigidbody.length; i++) {
 		rb = pool_get(&phys->p_rigidbody, i);
 		
-		if (rb->grounded) {
+		if ( rb->grounded ) {			
 			float speed = vec3_length(rb->vel);
-						
+			
 			if (speed) {
-				float drop = speed * 5.0f * dt;
+				float drop = speed * 10.0f * dt;
 				
 				float f = lmaxf(speed - drop, 0) / speed;
 				
 				vec3_mulf(rb->vel, f, rb->vel);
 			}
-		} else {
-			vec3_mulf(rb->vel, 0.9995f, rb->vel);
 		}
 		
 		c_phys_add_force(rb, g);

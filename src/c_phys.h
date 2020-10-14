@@ -5,17 +5,11 @@
 
 #include "c_phys_collider.h"
 
-#include "c_phys_aabb.h"
-
-#include "c_phys_plane.h"
-
-#include "c_phys_capsule.h"
-
 typedef struct {
 	cphys_collider_t	collider;
 	
-	vec3_t*				pos;
 	vec3_t				vel;
+	vec3_t*				pos;
 	
 	gentity_t*			entity;
 	

@@ -55,6 +55,10 @@ float			vec3_maxf(vec3_t v);
 
 void			vec3_max(vec3_t a, vec3_t b, vec3_t c);
 
+void			vec3_cross(vec3_t a, vec3_t b, vec3_t c);
+
+void			vec3_round(vec3_t a, vec3_t b);
+
 float			vec3_dot(vec3_t a, vec3_t b);
 
 void			vec3_rotate(vec3_t v, quat_t q, vec3_t a);

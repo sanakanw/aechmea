@@ -2,10 +2,14 @@
 #define G_LOCAL_H
 
 #include "common.h"
-#include "g_scene.h"
+
 #include "input.h"
 
 #include "asset.h"
+
+#include "cirno.h"
+
+#include "g_scene.h"
 
 static const float FRAME_TIME = 1.0f / 60.0f;
 

@@ -19,7 +19,7 @@ typedef struct gscene_t {
 	void		(*free)(struct gscene_t* g, asset_t* asset);
 	void		(*render)(struct gscene_t* g);
 	void		(*update)(struct gscene_t* g, int update);
-	void		(*call)(struct gscene_t* g, in_event_t* event);
+	void		(*event)(struct gscene_t* g, in_event_t* event);
 	
 	void*		d;
 	
@@ -36,7 +36,7 @@ void				g_scene_update(gscene_t* scene, int t);
 
 void				g_scene_render(gscene_t* scene);
 
-void				g_scene_call(gscene_t* sscene, in_event_t* event);
+void				g_scene_event(gscene_t* sscene, in_event_t* event);
 
 void				g_scene_alloc_entity_pool(gscene_t* scene, int size);
 

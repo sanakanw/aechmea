@@ -80,6 +80,26 @@ void vec3_divf(vec3_t a, float b, vec3_t c) {
 	c[2] = a[2] / b;
 }
 
+void vec3_cross(vec3_t a, vec3_t b, vec3_t c) {
+	float ax = a[0];
+	float ay = a[1];
+	float az = a[2];
+	
+	float bx = b[0];
+	float by = b[1];
+	float bz = b[2];
+	
+	c[0] = ay * bz - az * by;
+	c[1] = az * bx - ax * bz;
+	c[2] = ax * by - ay * bx;
+}
+
+void vec3_round(vec3_t a, vec3_t b) {
+	b[0] = round(a[0]);
+	b[1] = round(a[1]);
+	b[2] = round(a[2]);
+}
+
 float vec3_maxf(vec3_t v) {
 	float f = -1024.0f;
 	

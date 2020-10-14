@@ -16,7 +16,10 @@ r_block_t r_add_block(int size) {
 	return ptr_block++;
 }
 
-void r_block_sub_data(r_block_t block, void* data, int offset, int size) {
+void r_bind_block(r_block_t block) {
 	glBindBuffer(GL_UNIFORM_BUFFER, pool_block[block]);
+}
+
+void r_block_sub_data(void* data, int offset, int size) {
 	glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
 }
