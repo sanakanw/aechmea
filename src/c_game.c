@@ -1,5 +1,7 @@
 #include "c_game.h"
 
+csprite_t* spr;
+
 void cg_init(gscene_t* scene, asset_t* asset) {
 	cgame_t* g = scene->d;
 
@@ -54,6 +56,13 @@ void cgame_load(gscene_t* scene, asset_t* asset) {
 
 	gentity_t* enemy = g_scene_add_entity(scene);
 		g_sprite_add(&g->sprite, enemy, 0, 0);
+
+		vec3_set(enemy->pos, 2, 0, 2);
+
+	gentity_t* enemy2 = g_scene_add_entity(scene);
+		spr = g_sprite_add(&g->sprite, enemy2, 0, 4);
+
+		vec3_set(enemy2->pos, 4, 0, 4);
 }
 
 void cgame_unload(gscene_t* scene, asset_t* asset) {
@@ -62,6 +71,8 @@ void cgame_unload(gscene_t* scene, asset_t* asset) {
 
 void cgame_update(gscene_t* scene, int t) {
 	cgame_t* g = scene->d;
+
+	spr->u = t % 30 > 15;
 
 	quat_copy(g->player.p->rot, g->view.rot);
 	vec3_copy(g->view.pos, g->player.p->pos);
@@ -76,6 +87,7 @@ void cgame_update(gscene_t* scene, int t) {
 	vec3_copy(g->render.light.light_pos, g->view.pos); 
 
 	g_phys_simulate(&g->phys, 1.0f / 60.0f, 4);
+	g_sprite_update(&g->sprite, g->view.pos);
 	g_render_update(&g->render, g->view.m);
 
 	g->input.yaw = 0;

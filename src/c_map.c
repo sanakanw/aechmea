@@ -111,10 +111,7 @@ r_mesh_t c_map_load_mesh(cmap_t* map) {
 		id = sbuf_alloc(&index, 6);
 		
 		for (int j = 0; j < 6; j++) {
-			int b = j % 3;
-
-			if (j / 3)
-				b = 3 - j % 3;
+			int b = j % 3 + j / 3;
 
 			id[j] = a + b;
 		}

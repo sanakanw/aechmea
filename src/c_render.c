@@ -50,6 +50,7 @@ void g_render_update(grender_t* render, mat4_t cam) {
 			
 			mat4_mul(cam, r->model, r->transform);
 		} else {
+			mat4_identity(r->model);
 			mat4_copy(cam, r->transform);
 		}
 	}

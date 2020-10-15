@@ -111,15 +111,18 @@ r_mesh_t r_alloc_mesh(int vbo, int ibo) {
 	return ptr_mesh++;
 }
 
-void r_sub_vertex(r_mesh_t r_mesh, float* vertices, int offset, int size) {
+void r_mesh_sub_vertex(r_mesh_t r_mesh, float* vertices, int offset, int size) {
 	mesh_t* mesh = &pool_mesh[r_mesh];
 
 	glBufferSubData(GL_ARRAY_BUFFER, (mesh->vbo + offset) * VERTEX_SIZE, size * VERTEX_SIZE, vertices);
 }
 
-void r_sub_index(r_mesh_t r_mesh, int* indices, int offset, int size) {
+void r_mesh_sub_index(r_mesh_t r_mesh, int* indices, int offset, int size) {
 	mesh_t* mesh = &pool_mesh[r_mesh];
 
+	for (int i = 0; i < size; i++)
+		indices[i] += mesh->vbo;
+	
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, (mesh->ibo + offset) * sizeof(int), size * sizeof(int), indices);
 }
 
@@ -129,9 +132,9 @@ r_mesh_t r_add_mesh(float* vertices, int vbsize, int* indices, int ibsize) {
 	mesh = r_alloc_mesh(vbsize, ibsize);
 	
 	if (indices)
-		r_sub_index(mesh, indices, 0, ibsize);
+		r_mesh_sub_index(mesh, indices, 0, ibsize);
 	
-	r_sub_vertex(mesh, vertices, 0, vbsize);
+	r_mesh_sub_vertex(mesh, vertices, 0, vbsize);
 
 	return mesh;
 }

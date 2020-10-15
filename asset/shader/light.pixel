@@ -26,28 +26,28 @@ void main() {
 
 	float light;
 		
-	if (color.x > color.y + color.z && light < 1.0) {
-		light = 1;
-	} else {
-		vec3 delta = vec3(light_pos) - vs_fragpos;
-		
-		vec3 lightdir = normalize(delta);
-		
-		vec3 normal = normalize(vs_normal);
-		
-		vec3 viewdir = normalize(vec3(view_pos) - vs_fragpos);
-		vec3 reflectdir = reflect(-lightdir, normal);
-		
-		float intensity = 4.0;
-		
-		float d = max(intensity - length(delta), 0.0);
-		float attuenation = d * d * 0.3 + d * 0.02;
-		
-		float diffuse = clamp(dot(normal, lightdir), 0.0, 1);
-		
-		float specular = pow(max(dot(viewdir, reflectdir), 0.0), 32);
-		
-		light = ambience + attuenation * (diffuse + 0.5 * specular);
+	vec3 delta = vec3(light_pos) - vs_fragpos;
+	
+	vec3 lightdir = normalize(delta);
+	
+	vec3 normal = normalize(vs_normal);
+	
+	vec3 viewdir = normalize(vec3(view_pos) - vs_fragpos);
+	vec3 reflectdir = reflect(-lightdir, normal);
+	
+	float intensity = 4.0;
+	
+	float d = max(intensity - length(delta), 0.0);
+	float attuenation = clamp(d * d * 0.3 + d * 0.02, 0, 1.5);
+	
+	float diffuse = dot(normal, lightdir);
+	
+	float specular = pow(max(dot(viewdir, reflectdir), 0.0), 32);
+	
+	light = ambience + attuenation * (diffuse + 0.5 * specular);
+	
+	if (color.x > color.y + color.z && light < 1.0f) {
+		light = 1.0f;
 	}
 
 	frag_color = vec4(light, light, light, 1.0f) * (color + 0.1);

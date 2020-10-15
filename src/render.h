@@ -27,9 +27,9 @@ r_mesh_t		r_add_mesh(float* vertices, int vbsize, int* indices, int ibsize);
 
 r_mesh_t		r_alloc_mesh(int vbo, int ibo);
 
-void			r_sub_index(r_mesh_t mesh, int* indices, int offset, int ibsize);
+void			r_mesh_sub_index(r_mesh_t mesh, int* indices, int offset, int ibsize);
 
-void			r_sub_vertex(r_mesh_t mesh, float* vertices, int offset, int vbsize);
+void			r_mesh_sub_vertex(r_mesh_t mesh, float* vertices, int offset, int vbsize);
 
 void			r_draw_mesh(r_mesh_t mesh, int offset, int size);
 
