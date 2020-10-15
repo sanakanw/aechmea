@@ -80,40 +80,29 @@ void r_init_buffer(int VERTEX_BUFFER_SIZE, int INDEX_BUFFER_SIZE) {
 	vframe_init(&vram, VERTEX_BUFFER_SIZE, INDEX_BUFFER_SIZE);
 }
 
-r_mesh_t r_add_mesh(float* vertices, int vbsize, int* indices, int ibsize) {
+r_mesh_t r_alloc_mesh(int vbo, int ibo) {
 	mesh_t* mesh = &pool_mesh[ptr_mesh];
 	
-	mesh->vbo	= vram.vertex.ptr / VERTEX_SIZE;
-	mesh->szvbo	= vbsize;
+	mesh->szvbo	= vbo;
+	mesh->vbo	= vram.vertex.ptr;
 	
-	int ptr_vertex = vram.vertex.ptr;
-
-	vram.vertex.ptr += vbsize * VERTEX_SIZE;
+	vram.vertex.ptr += vbo;
 
 	com_printf(LOG_DEBUG, "video: vertex alloc %i/%i", vram.vertex.ptr, vram.vertex.size);
 	
-	if (vram.vertex.ptr > vram.vertex.size)
+	if (vram.vertex.ptr * VERTEX_SIZE >= vram.vertex.size)
 		com_printf(LOG_ERROR, "video: vertex alloc failed %i/%i", vram.vertex.ptr, vram.vertex.size);
 	
-	glBufferSubData(GL_ARRAY_BUFFER, ptr_vertex, vbsize * VERTEX_SIZE, vertices);
-	
-	if (index) {
+	if (ibo) {
 		mesh->ibo = vram.index.ptr;
-		mesh->szibo = ibsize;
+		mesh->szibo = ibo;
 
-		int ptr_index = vram.index.ptr;
-
-		vram.index.ptr += ibsize;
+		vram.index.ptr += ibo;
 
 		if (vram.index.ptr * sizeof(int) >= vram.index.size)
 			com_printf(LOG_ERROR, "video: index alloc failed %i/%i", vram.index.ptr, vram.index.size);
 		
-		com_printf(LOG_DEBUG, "video: index alloc %i/%i", vram.index.ptr * sizeof(int), vram.index.size);
-
-		for (int i = 0; i < ibsize; i++)
-			indices[i] += mesh->vbo;
-
-		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, ptr_index * sizeof(int), ibsize * sizeof(int), indices);
+		com_printf(LOG_DEBUG, "video: index alloc %i/%i", vram.index.ptr, vram.index.size);
 	} else {
 		mesh->ibo = 0;
 		mesh->szibo = 0;
@@ -122,18 +111,52 @@ r_mesh_t r_add_mesh(float* vertices, int vbsize, int* indices, int ibsize) {
 	return ptr_mesh++;
 }
 
+void r_sub_vertex(r_mesh_t r_mesh, float* vertices, int offset, int size) {
+	mesh_t* mesh = &pool_mesh[r_mesh];
+
+	glBufferSubData(GL_ARRAY_BUFFER, (mesh->vbo + offset) * VERTEX_SIZE, size * VERTEX_SIZE, vertices);
+}
+
+void r_sub_index(r_mesh_t r_mesh, int* indices, int offset, int size) {
+	mesh_t* mesh = &pool_mesh[r_mesh];
+
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, (mesh->ibo + offset) * sizeof(int), size * sizeof(int), indices);
+}
+
+r_mesh_t r_add_mesh(float* vertices, int vbsize, int* indices, int ibsize) {
+	r_mesh_t mesh;
+
+	mesh = r_alloc_mesh(vbsize, ibsize);
+	
+	if (indices)
+		r_sub_index(mesh, indices, 0, ibsize);
+	
+	r_sub_vertex(mesh, vertices, 0, vbsize);
+
+	return mesh;
+}
+
 void r_draw_mesh(r_mesh_t r_mesh, int offset, int size) {
 	mesh_t* mesh = &pool_mesh[r_mesh];
 
-	if (!mesh->szibo) {
+	if (!size)
+		return;
+
+	if (mesh->szibo) {
+		if (offset + size > mesh->szibo)
+			com_printf(LOG_ERROR, "video: cannot mesh draw %i > %i", offset + size, mesh->szibo);
+
+		glDrawElements( GL_TRIANGLES, size, GL_UNSIGNED_INT, (int*) 0 + mesh->ibo + offset );
+	} else {
 		if (offset + size > mesh->szvbo)
 			com_printf(LOG_ERROR, "video: cannot mesh draw %i > %i", offset + size, mesh->szvbo);
 
 		glDrawArrays( GL_TRIANGLES, mesh->vbo + offset, size );
-	} else {
-		if (offset + size > mesh->szibo)
-			com_printf(LOG_ERROR, "video: cannot mesh draw %i > %i", offset + size, mesh->szvbo);
-
-		glDrawElements( GL_TRIANGLES, mesh->szibo + offset, GL_UNSIGNED_INT, (int*) 0 + size );
 	}
+}
+
+int r_mesh_size(r_mesh_t r_mesh) {
+	mesh_t* mesh = &pool_mesh[r_mesh];
+	
+	return mesh->szibo ? mesh->szibo : mesh->szvbo;
 }

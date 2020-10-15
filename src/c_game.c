@@ -126,8 +126,7 @@ r_mesh_t c_spr_mesh() {
 	}
 
 	return r_add_mesh(vertices, 4, indices, 6);
-}*/
-/*
+}
 void c_look_at(gentity_t* a, gentity_t* b) {
 	vec3_t d;
 

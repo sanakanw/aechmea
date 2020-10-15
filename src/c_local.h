@@ -100,11 +100,11 @@ typedef struct {
 typedef struct {
 	crender_t*	mesh;
 
-	pool_t*		pool;
+	pool_t		pool;
 } gsprite_t;
 
 void g_sprite_init(gsprite_t* sprite, memhunk_t* hunk, grender_t* render, int p_spr);
 
-void g_sprite_add(gsprite_t* sprite, gentity_t* entity, int u, int v);
+csprite_t* g_sprite_add(gsprite_t* sprite, gentity_t* entity, int u, int v);
 
 #endif
