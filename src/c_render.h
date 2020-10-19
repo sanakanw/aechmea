@@ -21,7 +21,6 @@ typedef struct {
 } crender_t;
 
 typedef struct {
-	vec4_t	view_pos;
 	vec4_t	light_pos;
 	
 	float	ambience;

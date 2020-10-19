@@ -23,6 +23,10 @@ void*		pool_alloc(pool_t* pool);
 
 void*		pool_get(pool_t* pool, int i);
 
+void		pool_remove(pool_t* pool, int i);
+
+int			pool_is_alloc(pool_t* pool, int i);
+
 #endif
 
 #ifndef M_HUNK_H

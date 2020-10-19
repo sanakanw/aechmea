@@ -9,7 +9,7 @@
 #include "c_game.h"
 
 gscene_t g_scene_list[] = {
-	{ cgame_load, cgame_unload, cgame_render, cgame_update, cgame_event }
+	{ cgame_load, cgame_unload, cgame_render, cgame_update, cgame_event, cgame_remove }
 };
 
 typedef enum {

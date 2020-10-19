@@ -33,3 +33,9 @@ gentity_t* g_scene_add_entity(gscene_t* scene) {
 	
 	return entity;
 }
+
+void g_scene_remove_entity(gscene_t* scene, gentity_t* entity) {
+	scene->remove(scene, entity);
+
+	pool_remove(&scene->pool, entity - (gentity_t*) scene->pool.blk);
+}

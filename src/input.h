@@ -126,6 +126,12 @@ typedef enum {
 } IN_KEYCODE;
 
 typedef enum {
+	MOUSE_BUTTON_1 = 0,
+	MOUSE_BUTTON_2 = 1,
+	MOUSE_BUTTON_3 = 2,
+} IN_MOUESBUTTON;
+
+typedef enum {
 	IN_KEYUP,
 	IN_KEYDOWN,
 	IN_MOUSEUP,

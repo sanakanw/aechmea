@@ -32,6 +32,28 @@ void keyboard_callback(GLFWwindow* window, int key, int scan, int action, int mo
 	}
 }
 
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+	in_event_t event;
+	
+	switch(action) {
+		case GLFW_PRESS:
+			event.type		= IN_MOUSEDOWN;
+			event.mbutton	= button;
+			
+			in_queue_event(event);
+			
+			break;
+		
+		case GLFW_RELEASE:
+			event.type		= IN_MOUSEUP;
+			event.mbutton	= button;
+			
+			in_queue_event(event);
+			
+			break;
+	}
+}
+
 void mousemove_callback(GLFWwindow* window, double xpos, double ypos) {
 	float dx = xpos - mouse_pos[0];
 	float dy = ypos - mouse_pos[1];
@@ -72,6 +94,7 @@ void win_poll(void) {
 void win_input_init(void) {
 	glfwSetKeyCallback(window, keyboard_callback);
 	glfwSetCursorPosCallback(window, mousemove_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 }
 
 void win_exit() {

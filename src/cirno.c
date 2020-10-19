@@ -121,6 +121,7 @@ float vec3_dot(vec3_t a, vec3_t b) {
 void vec3_rotate(vec3_t v, quat_t q, vec3_t a) {
 	quat_t c;
 	quat_t b;
+	
 	quat_conjugate(q, b);
 	
 	quat_vec3_mul(q, v, c);

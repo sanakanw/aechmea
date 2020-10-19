@@ -1,7 +1,5 @@
 #include "c_game.h"
 
-csprite_t* spr;
-
 void cg_init(gscene_t* scene, asset_t* asset) {
 	cgame_t* g = scene->d;
 
@@ -13,7 +11,7 @@ void cg_init(gscene_t* scene, asset_t* asset) {
 
 	c_view_init(&g->view);
 	c_map_init(&g->map, scene, &g->render, &g->phys, map->pixels, map->w, map->h);
-	c_player_init(&g->player, scene, asset, &g->render, &g->phys);
+	c_player_init(&g->player, scene, asset, &g->render, &g->phys, &g->sprite);
 
 	mat4_perspective(g->view.p, 640.0f / 480.0f, 1.57f, 0.1f, 100.0f);
 }
@@ -52,17 +50,14 @@ void cgame_load(gscene_t* scene, asset_t* asset) {
 	r_bind_texture(
 		r_add_texture(sprites->pixels, sprites->w, sprites->h), 0);
 
-	g->render.light.ambience = 0.3;
+	g->render.light.ambience = 0.2;
+
+	vec3_set(g->render.light.light_pos, 3, 1.0, 3);
 
 	gentity_t* enemy = g_scene_add_entity(scene);
 		g_sprite_add(&g->sprite, enemy, 0, 0);
 
-		vec3_set(enemy->pos, 2, 0, 2);
-
-	gentity_t* enemy2 = g_scene_add_entity(scene);
-		spr = g_sprite_add(&g->sprite, enemy2, 0, 4);
-
-		vec3_set(enemy2->pos, 4, 0, 4);
+		vec3_set(enemy->pos, 2, 0.5, 2);
 }
 
 void cgame_unload(gscene_t* scene, asset_t* asset) {
@@ -72,19 +67,16 @@ void cgame_unload(gscene_t* scene, asset_t* asset) {
 void cgame_update(gscene_t* scene, int t) {
 	cgame_t* g = scene->d;
 
-	spr->u = t % 30 > 15;
-
 	quat_copy(g->player.p->rot, g->view.rot);
 	vec3_copy(g->view.pos, g->player.p->pos);
 
+	vec3_copy(g->render.light.light_pos, g->player.p->pos);
+
 	c_view_free_look(&g->view, &g->input);
 	
-	c_player_update(&g->player, &g->input);
+	c_player_update(&g->player, &g->input, t);
 
 	c_view_update(&g->view);
-
-	vec3_copy(g->render.light.view_pos, g->view.pos); 
-	vec3_copy(g->render.light.light_pos, g->view.pos); 
 
 	g_phys_simulate(&g->phys, 1.0f / 60.0f, 4);
 	g_sprite_update(&g->sprite, g->view.pos);
@@ -108,6 +100,12 @@ void cgame_event(gscene_t* scene, in_event_t* event) {
 	c_input_event(&g->input, event);
 }
 
+void cgame_remove(gscene_t* scene, gentity_t* entity) {
+	cgame_t* g = scene->d;
+
+	g_sprite_remove(&g->sprite, entity);
+}
+
 void c_lock(gentity_t* a, gentity_t* b, vec3_t v) {
 	vec3_copy(b->pos, v);
 	vec3_rotate(b->pos, a->rot, b->pos);
@@ -116,37 +114,3 @@ void c_lock(gentity_t* a, gentity_t* b, vec3_t v) {
 	
 	quat_copy(b->rot, a->rot);
 }
-
-/*
-r_mesh_t c_spr_mesh() {
-	float vertices[32];
-
-	int indices[] = {
-		0, 1, 2,
-		1, 2, 3
-	};
-
-	int xc, yc;
-
-	for (int i = 0; i < 4; i++) {
-		xc = i % 2;
-		yc = i / 2;
-
-		vec3_set(vertices[i * 8 + 3], 0, 0, -1);
-		vec3_set(vertices[i * 8 + 0], xc - 0.5f, yc - 0.5f, 0.0f);
-		vec3_set(vertices[i * 8 + 6], xc * PX_SPRITE_W, yc * PX_SPRITE_H, 0);
-	}
-
-	return r_add_mesh(vertices, 4, indices, 6);
-}
-void c_look_at(gentity_t* a, gentity_t* b) {
-	vec3_t d;
-
-	vec3_t up = { 0, 1, 0 };
-
-	vec3_sub(b->pos, a->pos, d);
-
-	float t = atan2(d[0], d[2]) + M_PI;
-
-	quat_rotate(b->rot, up, t);
-}*/

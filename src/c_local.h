@@ -18,6 +18,8 @@ void c_move(gentity_t* entity, cphys_t* pm, vec3_t cmd);
 typedef struct {
 	vec3_t	axis;
 
+	int		attack[3];
+
 	float	yaw;
 	float	pitch;
 } cinput_t;
@@ -44,25 +46,6 @@ void c_view_update(cview_t* view);
 void c_view_free_move(cview_t* view, cinput_t* input);
 
 void c_view_free_look(cview_t* view, cinput_t* input);
-
-#endif
-
-#ifndef C_PLAYER_H
-#define C_PLAYER_H
-
-typedef struct {
-	cphys_t*	pm;
-
-	cinput_t*	input;
-
-	gentity_t*	p;
-
-	gentity_t*	hand;
-} cplayer_t;
-
-void c_player_init(cplayer_t* p, gscene_t* scene, asset_t* asset, grender_t* render, gphys_t* phys);
-
-void c_player_update(cplayer_t* p, cinput_t* input);
 
 #endif
 
@@ -93,6 +76,8 @@ void c_map_init(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys,
 typedef struct {
 	gentity_t*	entity;
 
+	int			proj;
+
 	int			u;
 	int			v;
 } csprite_t;
@@ -103,10 +88,59 @@ typedef struct {
 	pool_t		pool;
 } gsprite_t;
 
-void g_sprite_init(gsprite_t* sprite, memhunk_t* hunk, grender_t* render, int p_spr);
+void g_sprite_init(gsprite_t* sprite, memhunk_t* hunk, grender_t* render, int pool_size);
 
 void g_sprite_update(gsprite_t* sprite, vec3_t p);
 
 csprite_t* g_sprite_add(gsprite_t* sprite, gentity_t* entity, int u, int v);
+
+void g_sprite_remove(gsprite_t* sprite, gentity_t* entity);
+
+#endif
+
+#ifndef C_PROJECTILE_H
+#define C_PROJECTILE_H
+
+typedef struct {
+	vec3_t	dir;
+
+	gentity_t* entity;
+
+	int		live_time;
+} cprojectile_t;
+
+typedef struct {
+	
+
+	pool_t pool;
+} gprojectile_t;
+
+void g_projectile_init(gprojectile_t* gproj, memhunk_t* hunk, int pool_size);
+
+void g_projectile_update(gprojectile_t* gproj);
+
+#endif
+
+#ifndef C_PLAYER_H
+#define C_PLAYER_H
+
+typedef struct {
+	gscene_t*	scene;
+
+	gsprite_t*	sprite;
+
+	cphys_t*	pm;
+
+	cinput_t*	input;
+
+	gentity_t*	p;
+
+	gentity_t*	hand;
+} cplayer_t;
+
+void c_player_init(cplayer_t* p, gscene_t* scene, asset_t* asset,
+					grender_t* render, gphys_t* phys, gsprite_t* sprite);
+
+void c_player_update(cplayer_t* p, cinput_t* input, int t);
 
 #endif

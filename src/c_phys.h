@@ -14,6 +14,8 @@ typedef struct {
 	gentity_t*			entity;
 	
 	float				mass;
+
+	int					gravity;
 	
 	int					grounded;
 } cphys_t;

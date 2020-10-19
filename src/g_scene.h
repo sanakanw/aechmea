@@ -20,6 +20,7 @@ typedef struct gscene_t {
 	void		(*render)(struct gscene_t* g);
 	void		(*update)(struct gscene_t* g, int update);
 	void		(*event)(struct gscene_t* g, in_event_t* event);
+	void		(*remove)(struct gscene_t* g, gentity_t* entity);
 	
 	void*		d;
 	
@@ -41,5 +42,7 @@ void				g_scene_event(gscene_t* sscene, in_event_t* event);
 void				g_scene_alloc_entity_pool(gscene_t* scene, int size);
 
 gentity_t*			g_scene_add_entity(gscene_t* scene);
+
+void				g_scene_remove_entity(gscene_t* scene, gentity_t* entity);
 
 #endif

@@ -35,4 +35,6 @@ void	cgame_update(gscene_t* scene, int t);
 
 void	cgame_event(gscene_t* scene, in_event_t* event);
 
+void	cgame_remove(gscene_t* scene, gentity_t* entity);
+
 #endif

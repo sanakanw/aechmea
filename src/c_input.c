@@ -27,6 +27,12 @@ void c_input_event(cinput_t* input, in_event_t* event) {
 					input->axis[1]  = event->type == IN_KEYDOWN;
 			}
 		}; break;
+
+		case IN_MOUSEUP:
+		case IN_MOUSEDOWN:
+			input->attack[event->mbutton] = event->type == IN_MOUSEDOWN;
+
+			break;
 		
 		case IN_MOUSEMOVE: {
 			input->yaw		= event->mpos[0];
