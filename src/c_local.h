@@ -127,6 +127,7 @@ void g_projectile_update(gprojectile_t* gproj);
 typedef struct {
 	gscene_t*	scene;
 
+	gphys_t*	phys;
 	gsprite_t*	sprite;
 
 	cphys_t*	pm;

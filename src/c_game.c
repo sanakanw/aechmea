@@ -103,6 +103,7 @@ void cgame_event(gscene_t* scene, in_event_t* event) {
 void cgame_remove(gscene_t* scene, gentity_t* entity) {
 	cgame_t* g = scene->d;
 
+	g_phys_remove_rigidbody(&g->phys, entity);
 	g_sprite_remove(&g->sprite, entity);
 }
 

@@ -63,6 +63,9 @@ void g_phys_collide(gphys_t* phys, float dt) {
 	vec3_t v;
 	
 	for (int i = 0; i < phys->p_rigidbody.length; i++) {
+		if (!pool_is_alloc(&phys->p_rigidbody, i))
+			continue;
+
 		cphys_a = pool_get(&phys->p_rigidbody, i);
 		
 		cphys_a->grounded = 0;
@@ -70,6 +73,9 @@ void g_phys_collide(gphys_t* phys, float dt) {
 		a = &cphys_a->collider;
 		
 		for (int j = 0; j < phys->p_collider.length; j++) {
+			if (!pool_is_alloc(&phys->p_collider, j))
+				continue;
+			
 			b = pool_get(&phys->p_collider, j);
 			
 			cphys_collider_vtable[a->type][b->type](&it, a, b);
@@ -87,6 +93,9 @@ void g_phys_collide(gphys_t* phys, float dt) {
 		}
 
 		for (int j = i + 1; j < phys->p_rigidbody.length; j++) {
+			if (!pool_is_alloc(&phys->p_rigidbody, j))
+				continue;
+			
 			cphys_b = pool_get(&phys->p_rigidbody, j);
 			
 			b = &cphys_b->collider;
@@ -104,6 +113,9 @@ void g_phys_integrate(gphys_t* phys, float dt) {
 	vec3_t g = { 0.0f, -phys->gravity * dt, 0.0f };
 
 	for (int i = 0; i < phys->p_rigidbody.length; i++) {
+		if (!pool_is_alloc(&phys->p_rigidbody, i))
+			continue;
+		
 		rb = pool_get(&phys->p_rigidbody, i);
 		
 		if ( rb->grounded ) {			
@@ -135,6 +147,23 @@ void g_phys_simulate(gphys_t* phys, float dt, int iterations) {
 		g_phys_integrate(phys, t);
 		
 		g_phys_collide(phys, t);
+	}
+}
+
+void g_phys_remove_rigidbody(gphys_t* phys, gentity_t* entity) {
+	cphys_t* pm;
+
+	for (int i = 0; i < phys->p_rigidbody.length; i++) {
+		if (!pool_is_alloc(&phys->p_rigidbody, i))
+			continue;
+
+		pm = pool_get(&phys->p_rigidbody, i);
+
+		if (pm->entity == entity) {
+			pool_remove(&phys->p_rigidbody, pm - (cphys_t*) phys->p_rigidbody.blk);
+
+			break;
+		}
 	}
 }
 

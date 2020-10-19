@@ -31,6 +31,8 @@ void					g_phys_init(gphys_t* phys, memhunk_t* hunk, float gravity, int pool_rb,
 
 void					g_phys_simulate(gphys_t* phys, float dt, int iterations);
 
+void					g_phys_remove_rigidbody(gphys_t* phys, gentity_t* entity);
+
 cphys_t*				g_phys_add_rigidbody(gphys_t* phys, gentity_t* entity, float mass, cphys_collider_t col);
 
 cphys_collider_t*		g_phys_add_collider(gphys_t* phys, cphys_collider_t col);
