@@ -102,22 +102,22 @@ void g_sprite_remove(gsprite_t* sprite, gentity_t* entity);
 #define C_PROJECTILE_H
 
 typedef struct {
-	vec3_t	dir;
+	cphys_t*	rb;
 
-	gentity_t* entity;
-
-	int		live_time;
-} cprojectile_t;
+	int			live_time;
+} cbullet_t;
 
 typedef struct {
 	
 
 	pool_t pool;
-} gprojectile_t;
+} gbullet_t;
 
-void g_projectile_init(gprojectile_t* gproj, memhunk_t* hunk, int pool_size);
+void g_bullet_init(gbullet_t* bullet, memhunk_t* hunk, int pool_size);
 
-void g_projectile_update(gprojectile_t* gproj);
+void g_bullet_update(gbullet* bullet);
+
+cbullet_t* c_bullet_add(gbullet_t* bullet, vec3_t dt, float d, float live_time);
 
 #endif
 

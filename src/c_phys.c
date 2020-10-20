@@ -130,7 +130,8 @@ void g_phys_integrate(gphys_t* phys, float dt) {
 			}
 		}
 		
-		c_phys_add_force(rb, g);
+		if (rb->gravity)
+			c_phys_add_force(rb, g);
 		
 		vec3_mulf(rb->vel, dt, v);
 		
@@ -172,6 +173,7 @@ cphys_t* g_phys_add_rigidbody(gphys_t* phys, gentity_t* entity, float mass, cphy
 		cphys->collider	= collider;
 		cphys->entity	= entity;
 		cphys->pos		= &entity->pos;
+		cphys->gravity	= 1;
 		
 		vec3_init(cphys->vel);
 		
