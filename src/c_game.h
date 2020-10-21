@@ -14,6 +14,8 @@ typedef struct {
 
 	gsprite_t	sprite;
 
+	gbullet_t	bullet;
+
 	cview_t		view;
 
 	cinput_t	input;

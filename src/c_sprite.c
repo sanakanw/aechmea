@@ -25,9 +25,10 @@ void g_sprite_init(gsprite_t* sprite, memhunk_t* hunk, grender_t* render, int p_
 	free(indices);
 }
 
-csprite_t* g_sprite_add(gsprite_t* sprite, gentity_t* entity, int u, int v) {
+csprite_t* g_sprite_add(gsprite_t* sprite, gentity_t* entity, int free_rot, int u, int v) {
 	csprite_t* spr = pool_alloc(&sprite->pool);
 		spr->entity = entity;
+		spr->free_rot = free_rot;
 		spr->u = u;
 		spr->v = v;
 	
@@ -78,7 +79,7 @@ void g_sprite_update(gsprite_t* sprite, vec3_t p) {
 
 		spr = pool_get(&sprite->pool, i);
 
-		if (!spr->proj) {
+		if (!spr->free_rot) {
 			vec3_sub(spr->entity->pos, p, d);
 
 			a = atan2(d[0], d[2]);

@@ -1,0 +1,22 @@
+#version 330 core
+
+in vec2 vs_uv;
+in float vs_light;
+
+out vec4 frag_color;
+
+uniform sampler2D sampler;
+
+void main() {
+	vec4 color = texture2D(sampler, vs_uv);
+
+	if (color.w == 0)
+		discard;
+	
+	float light = vs_light;
+
+	if (color.x > color.y + color.z && light < 1.0f)
+		light = 1.3f;
+
+	frag_color = vec4(light, light, light, 1.0f) * color;
+}

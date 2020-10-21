@@ -19,11 +19,11 @@ void* pool_alloc(pool_t* pool) {
 		pool->ptr = pool->jmp[ptr];
 		pool->jmp[ptr] = 0;
 	} else {
-		if (pool->length == pool->size)
-			com_printf(LOG_ERROR, "pool: failed to allocate %i/%i", pool->length, pool->size);
-		
 		pool->ptr++;
 		pool->length++;
+		
+		if (pool->length == pool->size)
+			com_printf(LOG_ERROR, "pool: failed to allocate %i/%i", pool->length, pool->size);
 	}
 
 	com_printf(LOG_DEBUG, "pool: alloc %i/%i", ptr, pool->length);

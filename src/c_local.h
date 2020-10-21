@@ -76,7 +76,7 @@ void c_map_init(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys,
 typedef struct {
 	gentity_t*	entity;
 
-	int			proj;
+	int			free_rot;
 
 	int			u;
 	int			v;
@@ -88,36 +88,49 @@ typedef struct {
 	pool_t		pool;
 } gsprite_t;
 
-void g_sprite_init(gsprite_t* sprite, memhunk_t* hunk, grender_t* render, int pool_size);
+void		g_sprite_init(gsprite_t* sprite, memhunk_t* hunk, grender_t* render, int pool_size);
 
-void g_sprite_update(gsprite_t* sprite, vec3_t p);
+void		g_sprite_update(gsprite_t* sprite, vec3_t p);
 
-csprite_t* g_sprite_add(gsprite_t* sprite, gentity_t* entity, int u, int v);
+csprite_t*	g_sprite_add(gsprite_t* sprite, gentity_t* entity, int free_rot, int u, int v);
 
-void g_sprite_remove(gsprite_t* sprite, gentity_t* entity);
+void		g_sprite_remove(gsprite_t* sprite, gentity_t* entity);
 
 #endif
 
 #ifndef C_PROJECTILE_H
 #define C_PROJECTILE_H
 
-typedef struct {
-	cphys_t*	rb;
+typedef enum {
+	C_BULLET_PLAYER
+} cbulletType_t;
 
-	int			live_time;
+typedef struct {
+	cphys_t*		rb;
+
+	gentity_t*		entity;
+
+	int				alive;
+
+	cbulletType_t	type;
 } cbullet_t;
 
 typedef struct {
+	pool_t		pool;
 	
+	gphys_t*	phys;
 
-	pool_t pool;
+	gscene_t*	scene;
 } gbullet_t;
 
-void g_bullet_init(gbullet_t* bullet, memhunk_t* hunk, int pool_size);
+void		g_bullet_init(gbullet_t* bullet, memhunk_t* hunk, gscene_t* scene, gphys_t* phys, int pool_size);
 
-void g_bullet_update(gbullet* bullet);
+void		g_bullet_update(gbullet_t* bullet);
 
-cbullet_t* c_bullet_add(gbullet_t* bullet, vec3_t dt, float d, float live_time);
+void		g_bullet_remove(gbullet_t* bullet, gentity_t* entity);
+
+cbullet_t*	g_bullet_add(gbullet_t* bullet, gentity_t* entity, vec3_t dt, 
+							cbulletType_t type, float box, int alive);
 
 #endif
 
@@ -129,6 +142,7 @@ typedef struct {
 
 	gphys_t*	phys;
 	gsprite_t*	sprite;
+	gbullet_t*	bullet;
 
 	cphys_t*	pm;
 
@@ -140,7 +154,7 @@ typedef struct {
 } cplayer_t;
 
 void c_player_init(cplayer_t* p, gscene_t* scene, asset_t* asset,
-					grender_t* render, gphys_t* phys, gsprite_t* sprite);
+					grender_t* render, gphys_t* phys, gsprite_t* sprite, gbullet_t* bullet);
 
 void c_player_update(cplayer_t* p, cinput_t* input, int t);
 
