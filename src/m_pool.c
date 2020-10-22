@@ -26,7 +26,7 @@ void* pool_alloc(pool_t* pool) {
 			com_printf(LOG_ERROR, "pool: failed to allocate %i/%i", pool->length, pool->size);
 	}
 
-	com_printf(LOG_DEBUG, "pool: alloc %i/%i", ptr, pool->length);
+	com_printf(LOG_DEBUG, "pool: alloc %i/%i", ptr, pool->size);
 
 	return &pool->blk[ptr * pool->szblk];
 }
@@ -46,7 +46,7 @@ void pool_remove(pool_t* pool, int ptr) {
 		pool->ptr = ptr;
 	}
 
-	com_printf(LOG_DEBUG, "pool: remove; ptr: %i/%i", pool->ptr, pool->length);
+	com_printf(LOG_DEBUG, "pool: remove; ptr: %i/%i", pool->ptr, pool->size);
 }
 
 int pool_is_alloc(pool_t* pool, int i) {

@@ -12,6 +12,8 @@ typedef struct {
 	vec3_t*				pos;
 	
 	gentity_t*			entity;
+
+	cphys_collider_type_t (*on_collide(gentity_t));
 	
 	float				mass;
 

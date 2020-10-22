@@ -95,8 +95,8 @@ void g_sprite_update(gsprite_t* sprite, vec3_t p) {
 			xc = j % 2;
 			yc = j / 2;
 
-			xx = xc - 0.5f;
-			yy = yc - 0.5f;
+			xx = (xc - 0.5f) * spr->entity->scale[0];
+			yy = (yc - 0.5f) * spr->entity->scale[1];
 
 			vertices[j * 8 + 6] = (xc + spr->u) * PX_SPRITE_W;
 			vertices[j * 8 + 7] = (1 - yc + spr->v) * PX_SPRITE_H;
