@@ -44,7 +44,8 @@ void c_phys_impulse(cphys_t* rb, vec3_t v, float dt) {
 	cphys_move_vtable[rb->collider.type](&rb->collider, a);
 }
 
-void g_phys_init(gphys_t* phys, memhunk_t* hunk, float gravity, int p_rb, int p_col) {
+void g_phys_init(gphys_t* phys, memhunk_t* hunk, gscene_t* scene, float gravity, int p_rb, int p_col) {
+	phys->scene = scene;
 	phys->gravity = gravity;
 	
 	hunk_pool_alloc(hunk, &phys->p_collider, p_col, sizeof(cphys_collider_t));
@@ -80,15 +81,18 @@ void g_phys_collide(gphys_t* phys, float dt) {
 			
 			cphys_collider_vtable[a->type][b->type](&it, a, b);
 			
-			if (it.d < 0 && vec3_length(it.n) != 0) {
-				float b = 10.0f * it.d;
-				float lambda = -(vec3_dot(cphys_a->vel, it.n) + b) / vec3_dot(it.n, it.n);
+			if (it.d < 0) {
+				float beta = 10.0f * it.d;
+				float lambda = -(vec3_dot(cphys_a->vel, it.n) + beta) / vec3_dot(it.n, it.n);
 				
 				vec3_mulf(it.n, lambda, v);
 
 				c_phys_impulse(cphys_a, v, dt);
-				
+
 				cphys_a->grounded = 1;
+				
+				if (cphys_a->on_clip_collide)
+					cphys_b->on_clip_collide(phys, cphys_a, b);
 			}
 		}
 
@@ -174,6 +178,8 @@ cphys_t* g_phys_add_rigidbody(gphys_t* phys, gentity_t* entity, float mass, cphy
 		cphys->entity	= entity;
 		cphys->pos		= &entity->pos;
 		cphys->gravity	= 1;
+		cphys->on_clip_collide = NULL;
+		cphys->on_rigidbody_collide = NULL;
 		
 		vec3_init(cphys->vel);
 		

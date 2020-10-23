@@ -65,4 +65,6 @@ cbullet_t* g_bullet_add(gbullet_t* bullet, gentity_t* entity, vec3_t dt,
 	quat_rotate(q, axis, M_PI / 2.0f);
 
 	quat_mul(entity->rot, q, entity->rot);
+
+	return b;
 }

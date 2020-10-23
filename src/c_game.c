@@ -5,7 +5,7 @@ void cg_init(gscene_t* scene, asset_t* asset) {
 
 	asset_tex_t* map = asset_find_texture(asset, "asset/tex/map.png");
 
-	g_phys_init(&g->phys, &scene->hunk, 9.81f, 32, 4);
+	g_phys_init(&g->phys, &scene->hunk, scene, 9.81f, 32, 4);
 	g_render_init(&g->render, &scene->hunk, 4);
 	g_sprite_init(&g->sprite, &scene->hunk, &g->render, 32);
 	g_bullet_init(&g->bullet, &scene->hunk, scene, &g->phys, 32); 

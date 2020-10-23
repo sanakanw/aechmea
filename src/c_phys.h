@@ -5,7 +5,9 @@
 
 #include "c_phys_collider.h"
 
-typedef struct {
+struct gphys_s;
+
+typedef struct cphys_s {
 	cphys_collider_t	collider;
 	
 	vec3_t				vel;
@@ -13,7 +15,8 @@ typedef struct {
 	
 	gentity_t*			entity;
 
-	cphys_collider_type_t (*on_collide(gentity_t));
+	void				(*on_clip_collide)(struct gphys_s* phys, struct cphys_s* a, cphys_collider_t* b);
+	void				(*on_rigidbody_collide)(struct gphys_s* phys, struct cphys_s* a, struct cphys_s* b);
 	
 	float				mass;
 
@@ -22,14 +25,16 @@ typedef struct {
 	int					grounded;
 } cphys_t;
 
-typedef struct {
-	float	gravity;
-	
+typedef struct gphys_s {
 	pool_t	p_collider;
 	pool_t	p_rigidbody;
+	
+	gscene_t* scene;
+	
+	float	gravity;
 } gphys_t;
 
-void					g_phys_init(gphys_t* phys, memhunk_t* hunk, float gravity, int pool_rb, int pool_col);
+void					g_phys_init(gphys_t* phys, memhunk_t* hunk, gscene_t* scene, float gravity, int pool_rb, int pool_col);
 
 void					g_phys_simulate(gphys_t* phys, float dt, int iterations);
 

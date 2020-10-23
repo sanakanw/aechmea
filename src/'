@@ -11,8 +11,8 @@ int atk_next = 0;
 
 const int atk_cd = 8;
 
-void c_player_bullet_clip_collide(gphys_t* phys, cphys_t* a, cphys_collider_t* b) {
-	g_scene_remove_entity(phys->scene, a->entity);
+void c_player_bullet_clip_collide(cphys_collider_t* clip) {
+	
 }
 
 void c_player_init(cplayer_t* player, gscene_t* scene, asset_t* asset,
