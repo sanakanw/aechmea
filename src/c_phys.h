@@ -15,8 +15,8 @@ typedef struct cphys_s {
 	
 	gentity_t*			entity;
 
-	void				(*on_clip_collide)(struct gphys_s* phys, struct cphys_s* a, cphys_collider_t* b);
-	void				(*on_rigidbody_collide)(struct gphys_s* phys, struct cphys_s* a, struct cphys_s* b);
+	struct cphys_s*		rb_collide;
+	cphys_collider_t*	clip_collide;
 	
 	float				mass;
 
@@ -45,5 +45,7 @@ cphys_t*				g_phys_add_rigidbody(gphys_t* phys, gentity_t* entity, float mass, c
 cphys_collider_t*		g_phys_add_collider(gphys_t* phys, cphys_collider_t col);
 
 void					c_phys_add_force(cphys_t* rb, vec3_t v);
+
+void					c_phys_accelerate(cphys_t* pm, vec3_t wishdir, float accel, float max_vel);
 
 #endif

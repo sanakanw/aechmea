@@ -32,6 +32,40 @@ void c_phys_add_force(cphys_t* rb, vec3_t v) {
 	vec3_add(rb->vel, m, rb->vel);
 }
 
+void c_phys_accelerate(cphys_t* pm, vec3_t wishdir, float accel, float wishspeed) {
+	vec3_t v;
+	
+	float addspeed, accelspeed, currentspeed;
+	
+	currentspeed = vec3_dot(pm->vel, wishdir);
+	
+	addspeed = wishspeed - currentspeed;
+	
+	if (addspeed <= 0)
+		return;
+	
+	accelspeed = accel * wishspeed;
+	
+	if (accelspeed > addspeed)
+		accelspeed = addspeed;
+	
+	vec3_mulf(wishdir, accelspeed, v);
+	
+	c_phys_add_force(pm, v);
+
+	float magnitude = vec3_length(pm->vel);
+
+	float max_vel = 8.0f;
+
+	if (magnitude > max_vel) {
+		float cap = 1 - max_vel / magnitude;
+
+		vec3_mulf(pm->vel, -cap, v);
+
+		c_phys_add_force(pm, v);
+	}
+}
+
 void c_phys_impulse(cphys_t* rb, vec3_t v, float dt) {
 	vec3_t a;
 	
@@ -91,8 +125,7 @@ void g_phys_collide(gphys_t* phys, float dt) {
 
 				cphys_a->grounded = 1;
 				
-				if (cphys_a->on_clip_collide)
-					cphys_b->on_clip_collide(phys, cphys_a, b);
+				cphys_a->clip_collide = b;
 			}
 		}
 
@@ -105,6 +138,11 @@ void g_phys_collide(gphys_t* phys, float dt) {
 			b = &cphys_b->collider;
 			
 			cphys_collider_vtable[a->type][b->type](&it, a, b);
+
+			if (it.d < 0) {
+				cphys_a->rb_collide = cphys_b;
+				cphys_b->rb_collide = cphys_a;
+			}
 		}
 	}
 }
@@ -121,6 +159,9 @@ void g_phys_integrate(gphys_t* phys, float dt) {
 			continue;
 		
 		rb = pool_get(&phys->p_rigidbody, i);
+
+		rb->rb_collide = NULL;
+		rb->clip_collide = NULL;
 		
 		if ( rb->grounded ) {			
 			float speed = vec3_length(rb->vel);
@@ -159,15 +200,14 @@ void g_phys_remove_rigidbody(gphys_t* phys, gentity_t* entity) {
 	cphys_t* pm;
 
 	for (int i = 0; i < phys->p_rigidbody.length; i++) {
-		if (!pool_is_alloc(&phys->p_rigidbody, i))
-			continue;
+		if (pool_is_alloc(&phys->p_rigidbody, i)) {
+			pm = pool_get(&phys->p_rigidbody, i);
 
-		pm = pool_get(&phys->p_rigidbody, i);
+			if (pm->entity == entity) {
+				pool_remove(&phys->p_rigidbody, pm - (cphys_t*) phys->p_rigidbody.blk);
 
-		if (pm->entity == entity) {
-			pool_remove(&phys->p_rigidbody, pm - (cphys_t*) phys->p_rigidbody.blk);
-
-			break;
+				return;
+			}
 		}
 	}
 }
@@ -178,8 +218,8 @@ cphys_t* g_phys_add_rigidbody(gphys_t* phys, gentity_t* entity, float mass, cphy
 		cphys->entity	= entity;
 		cphys->pos		= &entity->pos;
 		cphys->gravity	= 1;
-		cphys->on_clip_collide = NULL;
-		cphys->on_rigidbody_collide = NULL;
+		cphys->clip_collide = NULL;
+		cphys->rb_collide = NULL;
 		
 		vec3_init(cphys->vel);
 		

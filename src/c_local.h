@@ -6,9 +6,19 @@
 #include "c_phys.h"
 #include "c_render.h"
 
-void c_lock(gentity_t* a, gentity_t* b, vec3_t p);
+typedef enum {
+	C_MAP,
+	C_PLAYER,
+	C_GHOST,
+	C_BULLET
+} centityType_t;
 
-void c_move(gentity_t* entity, cphys_t* pm, vec3_t cmd);
+typedef struct {
+	float hp[32];
+
+} ghealth_t;
+
+void c_lock(gentity_t* a, gentity_t* b, vec3_t p);
 
 #endif
 
@@ -98,8 +108,8 @@ void		g_sprite_remove(gsprite_t* sprite, gentity_t* entity);
 
 #endif
 
-#ifndef C_PROJECTILE_H
-#define C_PROJECTILE_H
+#ifndef C_BULLET_H
+#define C_BULLET_H
 
 typedef enum {
 	C_BULLET_PLAYER
@@ -120,10 +130,13 @@ typedef struct {
 	
 	gphys_t*	phys;
 
+	ghealth_t*	health;
+
 	gscene_t*	scene;
 } gbullet_t;
 
-void		g_bullet_init(gbullet_t* bullet, memhunk_t* hunk, gscene_t* scene, gphys_t* phys, int pool_size);
+void		g_bullet_init(gbullet_t* bullet, memhunk_t* hunk, gscene_t* scene,
+							gphys_t* phys, ghealth_t* health, int pool_size);
 
 void		g_bullet_update(gbullet_t* bullet);
 
@@ -131,6 +144,48 @@ void		g_bullet_remove(gbullet_t* bullet, gentity_t* entity);
 
 cbullet_t*	g_bullet_add(gbullet_t* bullet, gentity_t* entity, vec3_t dt, 
 							cbulletType_t type, float box, int alive);
+
+#endif
+
+#ifndef C_DIRECTOR_H
+#define C_DIRECTOR_H
+
+typedef enum {
+	C_GHOST_ORB
+} cghostType_t;
+
+typedef struct {
+	gentity_t*		entity;
+
+	cphys_t*		pm;
+
+	csprite_t*		spr;
+
+	int				hp;
+
+	cghostType_t	type;
+} cghost_t;
+
+typedef struct {
+	pool_t		pool;
+
+	gscene_t*	scene;
+
+	gphys_t*	phys;
+	
+	gsprite_t*	sprite;
+	
+	gbullet_t*	bullet;
+
+	ghealth_t*	health;
+} gdirector_t;
+
+void g_director_init(gdirector_t* director, memhunk_t* hunk, gscene_t* scene, gphys_t* phys,
+						gsprite_t* sprite, gbullet_t* bullet, ghealth_t* health, int size);
+
+void g_director_add_ghost(gdirector_t* director, cghostType_t type, vec3_t p);
+
+void g_director_update(gdirector_t* director, gentity_t* player, int t);
 
 #endif
 

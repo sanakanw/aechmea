@@ -31,8 +31,6 @@ csprite_t* g_sprite_add(gsprite_t* sprite, gentity_t* entity, int free_rot, int 
 		spr->free_rot = free_rot;
 		spr->u = u;
 		spr->v = v;
-	
-	sprite->mesh->size += 6;
 
 	return spr;
 }
@@ -48,8 +46,6 @@ void g_sprite_remove(gsprite_t* sprite, gentity_t* entity) {
 
 		if (spr->entity == entity) {
 			pool_remove(&sprite->pool, spr - (csprite_t*) sprite->pool.blk);
-			
-			sprite->mesh->size -= 6;
 
 			break;
 		}
@@ -114,4 +110,6 @@ void g_sprite_update(gsprite_t* sprite, vec3_t p) {
 
 		s_count++;
 	}
+
+	sprite->mesh->size = s_count * 6;
 }

@@ -12,6 +12,8 @@ typedef struct {
 	vec3_t	scale;
 	
 	quat_t	rot;
+
+	int		tag;
 } gentity_t;
 
 typedef struct gscene_t {

@@ -50,7 +50,7 @@ void*		hunk_ptr(memhunk_t* hunk);
 
 void		hunk_reset(memhunk_t* hunk, void* reset);
 
-void		hunk_pool_alloc(memhunk_t* hunk, pool_t* pool, int size, int sizeblk);
+void		hunk_pool_alloc(memhunk_t* hunk, pool_t* pool, int size, int szblk);
 
 #endif
 
@@ -73,6 +73,5 @@ void*		sbuf_alloc(sbuf_t* v, int size);
 void*		sbuf_get(sbuf_t* v, int i);
 
 void		sbuf_free(sbuf_t* v);
-
 
 #endif

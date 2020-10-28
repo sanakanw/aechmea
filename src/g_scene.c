@@ -30,6 +30,8 @@ gentity_t* g_scene_add_entity(gscene_t* scene) {
 		
 		vec3_init(entity->pos);
 		quat_init(entity->rot);
+
+	entity->tag = -1;
 	
 	return entity;
 }

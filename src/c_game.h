@@ -8,20 +8,17 @@ typedef enum {
 } cg_shader_t;
 
 typedef struct {
-	gphys_t		phys;
+	ghealth_t	health;
 	
+	gphys_t		phys;
 	grender_t	render;
-
 	gsprite_t	sprite;
-
 	gbullet_t	bullet;
+	gdirector_t	director;
 
 	cview_t		view;
-
 	cinput_t	input;
-
 	cmap_t		map;
-
 	cplayer_t	player;
 
 	r_shader_t	shader[1];

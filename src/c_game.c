@@ -8,7 +8,8 @@ void cg_init(gscene_t* scene, asset_t* asset) {
 	g_phys_init(&g->phys, &scene->hunk, scene, 9.81f, 32, 4);
 	g_render_init(&g->render, &scene->hunk, 4);
 	g_sprite_init(&g->sprite, &scene->hunk, &g->render, 32);
-	g_bullet_init(&g->bullet, &scene->hunk, scene, &g->phys, 32); 
+	g_bullet_init(&g->bullet, &scene->hunk, scene, &g->phys, &g->health, 32); 
+	g_director_init(&g->director, &scene->hunk, scene, &g->phys, &g->sprite, &g->bullet, &g->health, 32); 
 
 	c_view_init(&g->view);
 	c_map_init(&g->map, scene, &g->render, &g->phys, map->pixels, map->w, map->h);
@@ -39,7 +40,7 @@ void cgame_load(gscene_t* scene, asset_t* asset) {
 
 	memset(g, 0, sizeof(cgame_t));
 	
-	g_scene_alloc_entity_pool(scene, 16);
+	g_scene_alloc_entity_pool(scene, 32);
 
 	cg_init(scene, asset);
 	cg_load_shader(scene, asset);
@@ -55,10 +56,9 @@ void cgame_load(gscene_t* scene, asset_t* asset) {
 
 	vec3_set(g->render.light.light_pos, 3, 1.0, 3);
 
-	gentity_t* enemy = g_scene_add_entity(scene);
-		g_sprite_add(&g->sprite, enemy, 0, 0, 0);
+	vec3_t p = { 2.0, 1.5, 5.0 };
 
-		vec3_set(enemy->pos, 2, 0.5, 2);
+	g_director_add_ghost(&g->director, C_GHOST_ORB, p);
 }
 
 void cgame_unload(gscene_t* scene, asset_t* asset) {
@@ -71,7 +71,7 @@ void cgame_update(gscene_t* scene, int t) {
 	quat_copy(g->player.p->rot, g->view.rot);
 	vec3_copy(g->view.pos, g->player.p->pos);
 
-	// vec3_copy(g->render.light.light_pos, g->player.p->pos);
+	vec3_copy(g->render.light.light_pos, g->player.p->pos);
 
 	c_view_free_look(&g->view, &g->input);
 	
@@ -79,6 +79,7 @@ void cgame_update(gscene_t* scene, int t) {
 
 	c_view_update(&g->view);
 
+	g_director_update(&g->director, g->player.p, t);
 	g_bullet_update(&g->bullet);
 	g_phys_simulate(&g->phys, 1.0f / 60.0f, 4);
 	g_sprite_update(&g->sprite, g->view.pos);

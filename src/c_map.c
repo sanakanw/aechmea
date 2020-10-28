@@ -77,17 +77,17 @@ r_mesh_t c_map_load_mesh(cmap_t* map) {
 					n[(i + 1) % 2 * 2] = 0;
 					n[(i % 2) * 2] = (i / 2) * 2 - 1;
 
-					if (c_map_blk_at(map, x + n[0], y + n[2]) & C_MAP_WALL)
-						continue;
+					if (c_map_blk_at(map, x + n[0], y + n[2]) & C_MAP_FLOOR) {
 
-					vec3_mulf(n, 0.5f, v);
+						vec3_mulf(n, 0.5f, v);
 
-					vec3_add(v, p, v);
+						vec3_add(v, p, v);
 
-					vec3_set(t, 0.0f, 1.0f, 0.0f);
+						vec3_set(t, 0.0f, 1.0f, 0.0f);
 
-					q++;
-					c_map_push_wall(&vertex, v, n, t, 1, 1);
+						q++;
+						c_map_push_wall(&vertex, v, n, t, 1, 1);
+					}
 				}
 
 				vec3_set(n, 0.0f, 1.0f, 0.0f);
@@ -161,10 +161,9 @@ void c_map_init(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys,
 	vec3_t v = {0, 0, 0};
 
 	map->entity = g_scene_add_entity(scene);
-		
-		g_render_add(render, map->entity, c_map_load_mesh(map));
-		
-		g_phys_add_collider(phys, c_phys_map_init(v, map->m, w, h, C_MAP_SOLID));
+		map->entity->tag = C_MAP;
 
+		g_render_add(render, map->entity, c_map_load_mesh(map));
+		g_phys_add_collider(phys, c_phys_map_init(v, map->m, w, h, C_MAP_SOLID));
 		g_phys_add_collider(phys, c_phys_ground_init(map->m, C_MAP_FLOOR, w, h, 0.0f));
 }
