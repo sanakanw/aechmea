@@ -69,6 +69,9 @@ void g_sprite_update(gsprite_t* sprite, vec3_t p) {
 
 	vec3_t d;
 
+	float px = 1.0 / PX_SPRITE_W / 64.0;
+	float py = 1.0 / PX_SPRITE_H / 64.0;
+
 	for (int i = 0; i < sprite->pool.length; i++) {
 		if (!pool_is_alloc(&sprite->pool, i))
 			continue;
@@ -94,8 +97,8 @@ void g_sprite_update(gsprite_t* sprite, vec3_t p) {
 			xx = (xc - 0.5f) * spr->entity->scale[0];
 			yy = (yc - 0.5f) * spr->entity->scale[1];
 
-			vertices[j * 8 + 6] = (xc + spr->u) * PX_SPRITE_W;
-			vertices[j * 8 + 7] = (1 - yc + spr->v) * PX_SPRITE_H;
+			vertices[j * 8 + 6] = xc * (PX_SPRITE_W - 2 * px) + px + spr->u * PX_SPRITE_W;
+			vertices[j * 8 + 7] = (1 - yc) * (PX_SPRITE_H - py) + py  + spr->v * PX_SPRITE_H;
 
 			vec3_set(v, xx, yy, 0);
 

@@ -77,7 +77,7 @@ void c_player_update(cplayer_t* player, cinput_t* input, int t) {
 	if (input->attack[0] && t > c_player_atk_next) {
 
 		gentity_t* bullet = g_scene_add_entity(player->scene);
-			vec3_mulf(bullet->scale, 1.0f, bullet->scale);
+			vec3_mulf(bullet->scale, 0.7f, bullet->scale);
 
 			spr = g_sprite_add(player->sprite, bullet, 1, 0, 2);
 			
