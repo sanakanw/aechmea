@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 
 	load_assets(&asset);
 	
-	r_init(kb(256), kb(32));
+	r_init(kb(360), kb(64));
 	
 	g_init(&game, &asset, g_scene_list);
 

@@ -4,36 +4,25 @@ layout(location = 0) in vec3 pos;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 uv;
 
+struct clight_t {
+	vec4	pos;
+	vec4	color;
+};
+
 layout (std140) uniform block {
 	mat4	model;
 	mat4	transform;
 
-	vec4	light_pos;
-	
-	float	ambience;
+	clight_t	lights[8];
 };
 
 out vec2 vs_uv;
-out float vs_light;
+out vec3 vs_normal;
+out vec3 vs_fragpos;
 
 void main() {
 	vs_uv = uv;
+	vs_fragpos	= vec3(model * vec4(pos, 1.0));
 	gl_Position	= transform * vec4(pos, 1.0);
-	
-	vec3 vs_normal = mat3(transpose(inverse(model))) * normal;
-	vec3 vs_fragpos	= vec3(model * vec4(pos, 1.0));
 
-	vec3 delta = vec3(light_pos) - vs_fragpos;
-
-	vec3 lightdir = normalize(delta);
-
-	float d = max(4.0f - length(delta), 0.0);
-	float attuenation = clamp(d * d * 0.3 + d * 0.02, 0, 1.5);
-	
-	float diffuse = 1;
-
-	if (vs_normal.x != 0 && vs_normal.y != 0 && vs_normal.z != 0)
-		diffuse = dot(vs_normal, lightdir);
-
-	vs_light = ambience + attuenation * diffuse;
 }

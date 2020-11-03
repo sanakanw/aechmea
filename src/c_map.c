@@ -1,6 +1,7 @@
 #include "c_local.h"
 
 typedef enum {
+	C_MAP_LIGHT = 1,
 	C_MAP_WALL		= 0b00010000,
 	C_MAP_FLOOR		= 0b00100000,
 	C_MAP_SOLID		= 0b01000000,
@@ -49,56 +50,91 @@ cmap_block_t c_map_blk_at(cmap_t* map, int x, int y) {
 	return map->m[x + y * map->w];
 }
 
-r_mesh_t c_map_load_mesh(cmap_t* map) {
+void c_map_load(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys) {
 	sbuf_t index, vertex;
 
-	vec3_t v, n, t, p;
+	vec3_t v;
+	vec3_t pos;
+	vec3_t normal;
+	vec3_t tangent;
+
+	vec4_t color = { 1, 0, 0, 3.0f };
+
+	int uv[2];
 
 	int q = 0;
 
 	sbuf_init(&index, sizeof(int), 32);
 	sbuf_init(&vertex, sizeof(float), 32);
 	
-	vec3_set(n, 0.0f, 1.0f, 0.0f);
-	vec3_set(t, 1.0f, 0.0f, 0.0f);
+	vec3_set(normal, 0.0f, 1.0f, 0.0f);
+	vec3_set(tangent, 1.0f, 0.0f, 0.0f);
 
 	cmap_block_t blk;
 
 	for (int y = 0; y < map->h; y++) {
 		for (int x = 0; x < map->w; x++) {
-			p[0] = x + 0.5f;
-			p[1] = 0;
-			p[2] = y + 0.5f;
+			pos[0] = x + 0.5f;
+			pos[1] = 0;
+			pos[2] = y + 0.5f;
 
 			blk = c_map_blk_at(map, x, y);
 
+			switch (blk & 0b1111) {
+				case C_MAP_LIGHT:
+					uv[0] = 2;
+					uv[1] = 1;
+
+					break;
+				
+				default:
+					uv[0] = 1;
+					uv[1] = 1;
+					
+					break;
+			}
+
 			if (blk & C_MAP_WALL) {
 				for (int i = 0; i < 4; i++) {
-					n[(i + 1) % 2 * 2] = 0;
-					n[(i % 2) * 2] = (i / 2) * 2 - 1;
+					normal[(i + 1) % 2 * 2] = 0;
+					normal[(i % 2) * 2] = (i / 2) * 2 - 1;
 
-					if (c_map_blk_at(map, x + n[0], y + n[2]) & C_MAP_FLOOR) {
+					if (c_map_blk_at(map, x + normal[0], y + normal[2]) & C_MAP_FLOOR) {
+						vec3_mulf(normal, 0.5f, v);
 
-						vec3_mulf(n, 0.5f, v);
+						vec3_add(v, pos, v);
 
-						vec3_add(v, p, v);
+						vec3_set(tangent, 0.0f, 1.0f, 0.0f);
 
-						vec3_set(t, 0.0f, 1.0f, 0.0f);
+						c_map_push_wall(&vertex, v, normal, tangent, uv[0], uv[1]);
+
+						if ((blk & 0b1111) == C_MAP_LIGHT) {
+							vec3_mulf(normal, 1.0f, v);
+							vec3_add(v, pos, v);
+
+							v[1] = 1;
+
+							g_render_light_add(render, v, color);
+						}
 
 						q++;
-						c_map_push_wall(&vertex, v, n, t, 1, 1);
 					}
 				}
 
-				vec3_set(n, 0.0f, 1.0f, 0.0f);
-				vec3_set(t, 1.0f, 0.0f, 0.0f);
+				vec3_set(normal, 0.0f, 1.0f, 0.0f);
 
-				p[1] = 1;
+				pos[1] = 1;
 			}
 
 			if (blk & C_MAP_FLOOR) {
 				q++;
-				c_map_push_wall(&vertex, p, n, t, 0, 1);
+
+				if (rand() % 2 == 0)
+					vec3_set(tangent, 1.0f, 0.0f, 0.0f);
+				else 
+					vec3_set(tangent, 0.0f, 0.0f, 1.0f);
+
+				c_map_push_wall(&vertex, pos, normal, tangent, 0, 1);
 			}
 		}
 	}
@@ -121,8 +157,12 @@ r_mesh_t c_map_load_mesh(cmap_t* map) {
 	
 	sbuf_free(&index);
 	sbuf_free(&vertex);
-	
-	return mesh;
+
+	vec3_set(v, 0, 0, 0);
+
+	g_render_add(render, map->entity, mesh);
+	g_phys_add_collider(phys, c_phys_map_init(v, map->m, map->w, map->h, C_MAP_SOLID));
+	g_phys_add_collider(phys, c_phys_ground_init(map->m, C_MAP_FLOOR, map->w, map->h, 0.0f));
 }
 
 void c_map_init(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys,
@@ -152,6 +192,10 @@ void c_map_init(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys,
 				map->m[i] = C_MAP_WALL | C_MAP_SOLID;
 				break;
 			
+			case 0xffff00:
+				map->m[i] = C_MAP_LIGHT | C_MAP_WALL | C_MAP_SOLID;
+				break;
+			
 			default:
 				map->m[i] = 0;
 				break;
@@ -163,7 +207,5 @@ void c_map_init(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys,
 	map->entity = g_scene_add_entity(scene);
 		map->entity->tag = C_MAP;
 
-		g_render_add(render, map->entity, c_map_load_mesh(map));
-		g_phys_add_collider(phys, c_phys_map_init(v, map->m, w, h, C_MAP_SOLID));
-		g_phys_add_collider(phys, c_phys_ground_init(map->m, C_MAP_FLOOR, w, h, 0.0f));
+		c_map_load(map, scene, render, phys);
 }

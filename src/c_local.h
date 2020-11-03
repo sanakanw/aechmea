@@ -185,6 +185,8 @@ void g_director_init(gdirector_t* director, memhunk_t* hunk, gscene_t* scene, gp
 
 void g_director_add_ghost(gdirector_t* director, cghostType_t type, vec3_t p);
 
+void g_director_remove(gdirector_t* director, gentity_t* entity);
+
 void g_director_update(gdirector_t* director, gentity_t* player, int t);
 
 #endif
@@ -198,6 +200,7 @@ typedef struct {
 	gphys_t*	phys;
 	gsprite_t*	sprite;
 	gbullet_t*	bullet;
+	grender_t*	render;
 
 	cphys_t*	pm;
 
@@ -206,6 +209,8 @@ typedef struct {
 	gentity_t*	p;
 
 	gentity_t*	hand;
+
+	clight_t*	light;
 } cplayer_t;
 
 void c_player_init(cplayer_t* p, gscene_t* scene, asset_t* asset,

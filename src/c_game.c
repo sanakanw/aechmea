@@ -6,7 +6,7 @@ void cg_init(gscene_t* scene, asset_t* asset) {
 	asset_tex_t* map = asset_find_texture(asset, "asset/tex/map.png");
 
 	g_phys_init(&g->phys, &scene->hunk, scene, 9.81f, 32, 4);
-	g_render_init(&g->render, &scene->hunk, 4);
+	g_render_init(&g->render, &scene->hunk, 4, 8);
 	g_sprite_init(&g->sprite, &scene->hunk, &g->render, 32);
 	g_bullet_init(&g->bullet, &scene->hunk, scene, &g->phys, &g->health, 32); 
 	g_director_init(&g->director, &scene->hunk, scene, &g->phys, &g->sprite, &g->bullet, &g->health, 32); 
@@ -34,7 +34,7 @@ void cgame_load(gscene_t* scene, asset_t* asset) {
 
 	asset_tex_t* sprites = asset_find_texture(asset, "asset/tex/sprites.png");
 
-	hunk_init(&scene->hunk, kb(12));
+	hunk_init(&scene->hunk, kb(14));
 
 	g = scene->d = hunk_alloc(&scene->hunk, sizeof(cgame_t));
 
@@ -49,16 +49,8 @@ void cgame_load(gscene_t* scene, asset_t* asset) {
 
 	r_bind_shader(g->shader[CG_SHADER_LIGHT]);
 
-	r_bind_texture(
-		r_add_texture(sprites->pixels, sprites->w, sprites->h), 0);
+	r_bind_texture(r_add_texture(sprites->pixels, sprites->w, sprites->h), 0);
 
-	g->render.light.ambience = 0.2;
-
-	vec3_set(g->render.light.light_pos, 3, 1.0, 3);
-
-	vec3_t p = { 2.0, 1.5, 5.0 };
-
-	g_director_add_ghost(&g->director, C_GHOST_ORB, p);
 }
 
 void cgame_unload(gscene_t* scene, asset_t* asset) {
@@ -71,8 +63,6 @@ void cgame_update(gscene_t* scene, int t) {
 	quat_copy(g->player.p->rot, g->view.rot);
 	vec3_copy(g->view.pos, g->player.p->pos);
 
-	vec3_copy(g->render.light.light_pos, g->player.p->pos);
-
 	c_view_free_look(&g->view, &g->input);
 	
 	c_player_update(&g->player, &g->input, t);
@@ -80,8 +70,8 @@ void cgame_update(gscene_t* scene, int t) {
 	c_view_update(&g->view);
 
 	g_director_update(&g->director, g->player.p, t);
-	g_bullet_update(&g->bullet);
 	g_phys_simulate(&g->phys, 1.0f / 60.0f, 4);
+	g_bullet_update(&g->bullet);
 	g_sprite_update(&g->sprite, g->view.pos);
 	g_render_update(&g->render, g->view.m);
 
@@ -106,6 +96,7 @@ void cgame_event(gscene_t* scene, in_event_t* event) {
 void cgame_remove(gscene_t* scene, gentity_t* entity) {
 	cgame_t* g = scene->d;
 
+	g_director_remove(&g->director, entity);
 	g_sprite_remove(&g->sprite, entity);
 	g_bullet_remove(&g->bullet, entity);
 	g_phys_remove_rigidbody(&g->phys, entity);

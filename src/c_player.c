@@ -5,11 +5,13 @@ vec3_t c_player_aabb[] = {
 	{  0.25f,  0.0f,  0.25f },
 };
 
-vec3_t c_player_hand_pos = { 0.0f, -0.15f, 0.2f };
+vec3_t c_player_hand_pos = { 0.1f, -0.2f, 0.2f };
 
-int atk_next = 0;
+vec4_t c_player_light_color = { 1, 1, 1, 2 };
 
-const int atk_cd = 8;
+int c_player_atk_next = 0;
+
+const int c_player_atk_cd = 4;
 
 void c_player_move(gentity_t* p, cphys_t* pm, vec3_t cmd) {
 	if (cmd[0] || cmd[2]) {
@@ -27,7 +29,7 @@ void c_player_move(gentity_t* p, cphys_t* pm, vec3_t cmd) {
 	}
 
 	if (pm->grounded && cmd[1]) {
-		vec3_t v = { 0.0f, 3.0f, 0.0f };
+		vec3_t v = { 0.0f, 2.6f, 0.0f };
 
 		c_phys_add_force(pm, v);
 
@@ -54,14 +56,17 @@ void c_player_init(cplayer_t* player, gscene_t* scene, asset_t* asset,
 	player->scene = scene;
 	player->sprite = sprite;
 	player->bullet = bullet;
+	player->render = render;
 	player->phys = phys;
+
+	player->light = g_render_light_add(render, player->hand->pos, c_player_light_color);
 }
 
 void c_player_update(cplayer_t* player, cinput_t* input, int t) {
 	vec3_t dir = { 0.0f, 0.0f, 20.0f };
-	
+
 	cbullet_t* b;
-	
+
 	cphys_t* phys;
 	csprite_t* spr;
 
@@ -69,18 +74,30 @@ void c_player_update(cplayer_t* player, cinput_t* input, int t) {
 
  	c_player_move(player->p, player->pm, input->axis);
 
-	if (input->attack[0] && t > atk_next) {
-		gentity_t* bullet = g_scene_add_entity(player->scene);
-			vec3_mulf(bullet->scale, 0.6f, bullet->scale);
+	if (input->attack[0] && t > c_player_atk_next) {
 
-			spr = g_sprite_add(player->sprite, bullet, 1, 2, 4);
+		gentity_t* bullet = g_scene_add_entity(player->scene);
+			vec3_mulf(bullet->scale, 1.0f, bullet->scale);
+
+			spr = g_sprite_add(player->sprite, bullet, 1, 0, 2);
 			
 			vec3_rotate(dir, player->p->rot, dir);
 			vec3_copy(bullet->pos, player->hand->pos);
 			quat_copy(bullet->rot, player->p->rot);
 
-			b = g_bullet_add(player->bullet, bullet, dir, C_BULLET_PLAYER, 0.1f, 30);
+			b = g_bullet_add(player->bullet, bullet, dir, C_BULLET_PLAYER, 0.1f, 50);
 
-		atk_next = t + atk_cd;
+		c_player_atk_next = t + c_player_atk_cd;
 	}
+
+	vec3_t v = { 0, 0, 2 };
+
+	vec3_rotate(v, player->p->rot, v);
+
+	if (v[1] < 0.1)
+		v[1] = 0.1;
+
+	vec3_add(v, player->p->pos, v);
+
+	g_render_light_update(player->render, player->light, v, c_player_light_color);
 }

@@ -86,6 +86,20 @@ void g_phys_init(gphys_t* phys, memhunk_t* hunk, gscene_t* scene, float gravity,
 	hunk_pool_alloc(hunk, &phys->p_rigidbody, p_rb, sizeof(cphys_t));
 }
 
+void g_phys_reset(gphys_t* phys) {
+	cphys_t* rb;
+
+	for (int i = 0; i < phys->p_rigidbody.length; i++) {
+		if (!pool_is_alloc(&phys->p_rigidbody, i))
+			continue;
+		
+		rb = pool_get(&phys->p_rigidbody, i);
+
+		rb->clip_collision = NULL;
+		rb->rigidbody_collision = NULL;
+	}
+}
+
 void g_phys_collide(gphys_t* phys, float dt) {
 	cphys_t* cphys_a;
 	cphys_t* cphys_b;
@@ -125,7 +139,7 @@ void g_phys_collide(gphys_t* phys, float dt) {
 
 				cphys_a->grounded = 1;
 				
-				cphys_a->clip_collide = b;
+				cphys_a->clip_collision = b;
 			}
 		}
 
@@ -140,8 +154,8 @@ void g_phys_collide(gphys_t* phys, float dt) {
 			cphys_collider_vtable[a->type][b->type](&it, a, b);
 
 			if (it.d < 0) {
-				cphys_a->rb_collide = cphys_b;
-				cphys_b->rb_collide = cphys_a;
+				cphys_a->rigidbody_collision = cphys_b;
+				cphys_b->rigidbody_collision = cphys_a;
 			}
 		}
 	}
@@ -159,9 +173,6 @@ void g_phys_integrate(gphys_t* phys, float dt) {
 			continue;
 		
 		rb = pool_get(&phys->p_rigidbody, i);
-
-		rb->rb_collide = NULL;
-		rb->clip_collide = NULL;
 		
 		if ( rb->grounded ) {			
 			float speed = vec3_length(rb->vel);
@@ -188,6 +199,8 @@ void g_phys_integrate(gphys_t* phys, float dt) {
 
 void g_phys_simulate(gphys_t* phys, float dt, int iterations) {
 	float t = dt / (float) iterations;
+
+	g_phys_reset(phys);
 	
 	for (int i = 0; i < iterations; i++) {
 		g_phys_integrate(phys, t);
@@ -218,8 +231,8 @@ cphys_t* g_phys_add_rigidbody(gphys_t* phys, gentity_t* entity, float mass, cphy
 		cphys->entity	= entity;
 		cphys->pos		= &entity->pos;
 		cphys->gravity	= 1;
-		cphys->clip_collide = NULL;
-		cphys->rb_collide = NULL;
+		cphys->clip_collision = NULL;
+		cphys->rigidbody_collision = NULL;
 		
 		vec3_init(cphys->vel);
 		

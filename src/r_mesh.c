@@ -91,7 +91,7 @@ r_mesh_t r_alloc_mesh(int vbo, int ibo) {
 	com_printf(LOG_DEBUG, "video: vertex alloc %i/%i", vram.vertex.ptr, vram.vertex.size);
 	
 	if (vram.vertex.ptr * VERTEX_SIZE >= vram.vertex.size)
-		com_printf(LOG_ERROR, "video: vertex alloc failed %i/%i", vram.vertex.ptr, vram.vertex.size);
+		com_printf(LOG_ERROR, "video: vertex alloc failed %i/%i", vram.vertex.ptr * VERTEX_SIZE, vram.vertex.size);
 	
 	if (ibo) {
 		mesh->ibo = vram.index.ptr;

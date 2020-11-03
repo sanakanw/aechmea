@@ -8,10 +8,20 @@ enum {
 	CBLOCK_LIGHT		= 128,
 } cblock_location_t;
 
-void g_render_init(grender_t* render, memhunk_t* hunk, int pool_size) {
-	render->vblk = r_add_block(128 + sizeof(clight_t) + 4 * sizeof(float));
+void g_render_init(grender_t* render, memhunk_t* hunk, int pool_size, int pool_light_size) {
+	int block_size = 128 + pool_light_size * sizeof(clight_t);
+
+	int c = 0;
+	
+	render->vblk = r_add_block(block_size);
+
+	for (int i = 0; i < pool_light_size; i++) {
+		r_block_sub_data(&c, CBLOCK_LIGHT + i * sizeof(clight_t) + 7 * sizeof(float), sizeof(int));
+	}
 
 	hunk_pool_alloc(hunk, &render->pool, pool_size, sizeof(crender_t));
+
+	hunk_pool_alloc(hunk, &render->pool_light, pool_light_size, sizeof(clight_t));
 }
 
 crender_t* g_render_add(grender_t* render, gentity_t* entity, r_mesh_t mesh) {
@@ -54,8 +64,6 @@ void g_render_update(grender_t* render, mat4_t cam) {
 			mat4_copy(cam, r->transform);
 		}
 	}
-
-	r_block_sub_data(&render->light, CBLOCK_LIGHT, sizeof(clight_t));
 }
 
 void g_render_render(grender_t* render) {
@@ -71,6 +79,21 @@ void g_render_render(grender_t* render) {
 		
 		r_draw_mesh(r->mesh, r->offset, r->size);
 	}
+}
+
+clight_t* g_render_light_add(grender_t* render, vec3_t pos, vec4_t color) {
+	clight_t* light = pool_alloc(&render->pool_light);
+	
+	g_render_light_update(render, light, pos, color);
+
+	return light;
+}
+
+void g_render_light_update(grender_t* render, clight_t* light, vec3_t pos, vec4_t color) {
+	vec3_copy(light->pos, pos);
+	quat_copy(light->color, color);
+
+	r_block_sub_data(light, CBLOCK_LIGHT + ((char*) light - (char*) render->pool_light.blk), sizeof(clight_t));
 }
 
 void g_render_attach_shader(grender_t* render, r_shader_t shader, const char* name) {

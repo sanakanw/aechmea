@@ -1,7 +1,19 @@
 #version 330 core
 
 in vec2 vs_uv;
-in float vs_light;
+in vec3 vs_fragpos;
+
+struct clight_t {
+	vec4	pos;
+	vec4	color;
+};
+
+layout (std140) uniform block {
+	mat4	model;
+	mat4	transform;
+
+	clight_t	lights[8];
+};
 
 out vec4 frag_color;
 
@@ -12,11 +24,32 @@ void main() {
 
 	if (color.w == 0)
 		discard;
+
+	vec3 delta;
+
+	float d, attuention;
+
+	vec4 light = vec4(0, 0, 0, 0);
+	float light_count = 0;
+
+	for (int i = 0; i < 8; i++) {
+		if (lights[i].color.w <= 0.0)
+			continue;
+
+		delta = vec3(lights[i].pos) - vs_fragpos;
+
+		d = max(lights[i].color.w - length(delta), 0) / lights[i].color.w;
+		attuention = d * d * 4.0;
+
+		light += lights[i].color * min(attuention, 2);
+		
+		light_count++;
+	}
+
+	light.w = 1;
 	
-	float light = vs_light;
+	if (color.x > color.y + color.z && light.x + light.y + light.z < 1.0f)
+		light = vec4(1, 1, 1, 1);
 
-	if (color.x > color.y + color.z && light < 1.0f)
-		light = 1.3f;
-
-	frag_color = vec4(light, light, light, 1.0f) * color;
+	frag_color = (0.15 + light) * color;
 }

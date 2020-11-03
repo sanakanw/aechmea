@@ -15,8 +15,8 @@ typedef struct cphys_s {
 	
 	gentity_t*			entity;
 
-	struct cphys_s*		rb_collide;
-	cphys_collider_t*	clip_collide;
+	cphys_collider_t*	clip_collision;
+	struct cphys_s*		rigidbody_collision;
 	
 	float				mass;
 

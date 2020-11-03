@@ -24,12 +24,14 @@ void g_bullet_update(gbullet_t* bullet) {
 
 			b->alive -= 1;
 
-			if (!b->alive || b->rb->clip_collide)
+			if (!b->alive || b->rb->clip_collision) {
 				g_scene_remove_entity(bullet->scene, b->entity);
-			
 
-			if (b->rb->rb_collide) {
-				entity = b->rb->rb_collide->entity;
+				return;
+			}
+
+			if (b->rb->rigidbody_collision) {
+				entity = b->rb->rigidbody_collision->entity;
 				tag = entity->tag;
 				
 				if (tag == C_GHOST) {
@@ -52,7 +54,7 @@ cbullet_t* g_bullet_add(gbullet_t* bullet, gentity_t* entity, vec3_t dt,
 		{ -box, -box, -box },
 		{  box,  box,  box }
 	};
-
+	
 	cbullet_t* b = pool_alloc(&bullet->pool);
 		b->type = type;
 		b->alive = alive;

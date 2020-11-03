@@ -56,3 +56,19 @@ void g_director_update(gdirector_t* director, gentity_t* player, int t) {
 			g_scene_remove_entity(director->scene, ghost->entity);
 	}
 }
+
+void g_director_remove(gdirector_t* director, gentity_t* entity) {
+	cghost_t* g;
+	
+	for (int i = 0; i < director->pool.length; i++) {
+		if (pool_is_alloc(&director->pool, i)) {
+			g = pool_get(&director->pool, i);
+
+			if (g->entity == entity) {
+				pool_remove(&director->pool, g - (cghost_t*) director->pool.blk);
+
+				return;
+			}
+		}
+	}
+}
