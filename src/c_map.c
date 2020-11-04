@@ -19,6 +19,9 @@ void c_map_push_wall(sbuf_t* vertex, vec3_t p, vec3_t n, vec3_t t, int uv_x, int
 
 	vec3_cross(n, t, b);
 
+	float px = 1.0 / PX_SPRITE_W / 64.0;
+	float py = 1.0 / PX_SPRITE_H / 64.0;
+
 	for (int i = 0; i < 4; i++) {
 		v = sbuf_alloc(vertex, 3);
 		vn = sbuf_alloc(vertex, 3);
@@ -36,10 +39,10 @@ void c_map_push_wall(sbuf_t* vertex, vec3_t p, vec3_t n, vec3_t t, int uv_x, int
 		vec3_add(p, j, v);
 		vec3_add(v, k, v);
 
-		vec3_copy(vn, n);
+		vec3_init(vn);
 
-		vt[0] = PX_SPRITE_W * (uv_x + xc);
-		vt[1] = PX_SPRITE_H * (uv_y + yc);
+		vt[0] = xc * (PX_SPRITE_W - 2 * px) + px + uv_x * PX_SPRITE_W;
+		vt[1] = (1 - yc) * (PX_SPRITE_H - 2 * py) + py + uv_y * PX_SPRITE_H;
 	}
 }
 
@@ -71,7 +74,6 @@ void c_map_load(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys) 
 	vec3_set(tangent, 1.0f, 0.0f, 0.0f);
 
 	cmap_block_t blk;
-
 	for (int y = 0; y < map->h; y++) {
 		for (int x = 0; x < map->w; x++) {
 			pos[0] = x + 0.5f;

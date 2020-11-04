@@ -52,67 +52,62 @@ void g_sprite_remove(gsprite_t* sprite, gentity_t* entity) {
 	}
 }
 
-void g_sprite_update(gsprite_t* sprite, vec3_t p) {
-	csprite_t* spr;
+void g_sprite_update(gsprite_t* sprite, vec3_t pos) {
+	csprite_t* s;
 	
-	float vertices[32];
-
 	int xc, yc;
 
-	float a,
-		xx, yy,
-		cosine, sine;
-
-	int s_count = 0;
-	
+	float vertices[32];
+	float theta, cosine, sine;	
 	float* v;
 
-	vec3_t d;
+	vec3_t delta;
+
+	int s_len = 0;
 
 	float px = 1.0 / PX_SPRITE_W / 64.0;
 	float py = 1.0 / PX_SPRITE_H / 64.0;
+
+	vec3_t up = { 0, 1, 0 };
 
 	for (int i = 0; i < sprite->pool.length; i++) {
 		if (!pool_is_alloc(&sprite->pool, i))
 			continue;
 
-		spr = pool_get(&sprite->pool, i);
+		s = pool_get(&sprite->pool, i);
 
-		if (!spr->free_rot) {
-			vec3_sub(spr->entity->pos, p, d);
+		if (!s->free_rot) {
+			vec3_sub(s->entity->pos, pos, delta);
 
-			a = atan2(d[0], d[2]);
+			theta = atan2(delta[0], delta[2]);
 
-			vec3_t axis = { 0, 1, 0 };
-
-			quat_rotate(spr->entity->rot, axis, a);
+			quat_rotate(s->entity->rot, up, theta);
 		}
 
 		for (int j = 0; j < 4; j++) {
 			v = &vertices[j * 8];
 
-			xc = j % 2;
-			yc = j / 2;
+			xc = j % 2; yc = j / 2;
 
-			xx = (xc - 0.5f) * spr->entity->scale[0];
-			yy = (yc - 0.5f) * spr->entity->scale[1];
+			vec3_set(v, xc, yc, 0);
 
-			vertices[j * 8 + 6] = xc * (PX_SPRITE_W - 2 * px) + px + spr->u * PX_SPRITE_W;
-			vertices[j * 8 + 7] = (1 - yc) * (PX_SPRITE_H - py) + py  + spr->v * PX_SPRITE_H;
+			v[0] -= 0.5f; v[1] -= 0.5f;
 
-			vec3_set(v, xx, yy, 0);
-
-			vec3_rotate(v, spr->entity->rot, v);
-
-			vec3_add(v, spr->entity->pos, v);
+			vec3_mul(v, s->entity->scale, v);
 			
-			vec3_set(&vertices[j * 8 + 3], 0, 0, 0);
+			vec3_rotate(v, s->entity->rot, v);
+			vec3_add(v, s->entity->pos, v);
+
+			vec3_init(&v[3]);
+
+			v[6] = xc * (PX_SPRITE_W - 2 * px) + px + s->u * PX_SPRITE_W;
+			v[7] = (1 - yc) * (PX_SPRITE_H - 2 * py) + py + s->v * PX_SPRITE_H;
 		}
 
-		r_mesh_sub_vertex(sprite->mesh->mesh, vertices, s_count * 4, 4);
+		r_mesh_sub_vertex(sprite->mesh->mesh, vertices, s_len * 4, 4);
 
-		s_count++;
+		s_len++;
 	}
 
-	sprite->mesh->size = s_count * 6;
+	sprite->mesh->size = s_len * 6;
 }

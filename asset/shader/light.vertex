@@ -22,7 +22,7 @@ out vec3 vs_fragpos;
 
 void main() {
 	vs_uv = uv;
+	vs_normal = mat3(transpose(inverse(model))) * normal;
 	vs_fragpos	= vec3(model * vec4(pos, 1.0));
 	gl_Position	= transform * vec4(pos, 1.0);
-
 }

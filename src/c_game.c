@@ -51,6 +51,9 @@ void cgame_load(gscene_t* scene, asset_t* asset) {
 
 	r_bind_texture(r_add_texture(sprites->pixels, sprites->w, sprites->h), 0);
 
+	vec3_t p = { 3, 1, 3 };
+
+	g_director_add_ghost(&g->director, C_GHOST_ORB, p);
 }
 
 void cgame_unload(gscene_t* scene, asset_t* asset) {

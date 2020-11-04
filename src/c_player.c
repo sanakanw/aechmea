@@ -94,8 +94,11 @@ void c_player_update(cplayer_t* player, cinput_t* input, int t) {
 
 	vec3_rotate(v, player->p->rot, v);
 
-	if (v[1] < 0.1)
-		v[1] = 0.1;
+	if (v[1] < -0.5) {
+		float f = -0.5 - v[1];
+		
+		vec3_mulf(v, 1-f, v);
+	}
 
 	vec3_add(v, player->p->pos, v);
 
