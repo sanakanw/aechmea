@@ -35,6 +35,8 @@ void			r_draw_mesh(r_mesh_t mesh, int offset, int size);
 
 int				r_mesh_size(r_mesh_t mesh);
 
+void			r_mesh_reset(r_mesh_t ptr);
+
 #endif
 
 #ifndef R_SHADER_H
@@ -65,5 +67,7 @@ r_block_t		r_add_block(int size);
 void			r_bind_block(r_block_t block);
 
 void			r_block_sub_data(void* data, int offset, int size);
+
+void			r_block_reset(r_block_t ptr);
 
 #endif

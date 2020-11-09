@@ -13,7 +13,9 @@ layout (std140) uniform block {
 	mat4	model;
 	mat4	transform;
 
-	clight_t	lights[8];
+	bool dead;
+
+	clight_t	lights[48];
 };
 
 out vec2 vs_uv;

@@ -1,7 +1,15 @@
 #include "c_local.h"
 
 typedef enum {
-	C_MAP_LIGHT = 1,
+	C_MAP_LIGHT_WALL = 1,
+	C_MAP_LIGHT_FLOOR,
+	C_MAP_GHOST_MAGE,
+	C_MAP_GHOST_ORB,
+	C_MAP_GHOST_WARRIOR,
+	C_MAP_GHOST_NECROMANCER,
+	C_MAP_GHOST_REAPER,
+	C_MAP_HEALTH,
+	C_MAP_EXIT,
 	C_MAP_WALL		= 0b00010000,
 	C_MAP_FLOOR		= 0b00100000,
 	C_MAP_SOLID		= 0b01000000,
@@ -53,7 +61,7 @@ cmap_block_t c_map_blk_at(cmap_t* map, int x, int y) {
 	return map->m[x + y * map->w];
 }
 
-void c_map_load(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys) {
+void c_map_load(cmap_t* map, gscene_t* scene, grender_t* render, gdirector_t* director, gphys_t* phys) {
 	sbuf_t index, vertex;
 
 	vec3_t v;
@@ -62,6 +70,8 @@ void c_map_load(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys) 
 	vec3_t tangent;
 
 	vec4_t color = { 1, 0, 0, 3.0f };
+	vec4_t portal_color = { 1, 0, 0, 1.0f };
+	vec4_t crystal_color = { 0, 1, 1, 2.0f };
 
 	int uv[2];
 
@@ -74,6 +84,7 @@ void c_map_load(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys) 
 	vec3_set(tangent, 1.0f, 0.0f, 0.0f);
 
 	cmap_block_t blk;
+	
 	for (int y = 0; y < map->h; y++) {
 		for (int x = 0; x < map->w; x++) {
 			pos[0] = x + 0.5f;
@@ -82,17 +93,53 @@ void c_map_load(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys) 
 
 			blk = c_map_blk_at(map, x, y);
 
+			if (blk & C_MAP_WALL) {
+				uv[0] = 1;
+				uv[1] = 1;
+			}
+			
+			if (blk & C_MAP_FLOOR) {
+				uv[0] = 0;
+				uv[1] = 1;
+			}
+
 			switch (blk & 0b1111) {
-				case C_MAP_LIGHT:
+				case C_MAP_LIGHT_WALL:
 					uv[0] = 2;
 					uv[1] = 1;
 
 					break;
+
+				case C_MAP_LIGHT_FLOOR:
+					uv[0] = 0;
+					uv[1] = 2;
+
+					g_render_light_add(render, pos, color);
+
+					break;
 				
-				default:
-					uv[0] = 1;
-					uv[1] = 1;
-					
+				case C_MAP_HEALTH:
+					g_render_light_add(render, pos, crystal_color);
+					g_director_add_health(director, pos);
+
+					break;
+				
+				case C_MAP_EXIT:
+					uv[0] = 0;
+					uv[1] = 2;
+
+					g_render_light_add(render, pos, portal_color);
+					g_director_set_exit(director, pos);
+
+					break;
+				
+				case C_MAP_GHOST_ORB:
+				case C_MAP_GHOST_MAGE:
+				case C_MAP_GHOST_WARRIOR:
+				case C_MAP_GHOST_NECROMANCER:
+				case C_MAP_GHOST_REAPER:
+					g_director_add_ghost(director, (blk & 0b1111) - C_MAP_GHOST_MAGE, pos);
+
 					break;
 			}
 
@@ -110,7 +157,7 @@ void c_map_load(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys) 
 
 						c_map_push_wall(&vertex, v, normal, tangent, uv[0], uv[1]);
 
-						if ((blk & 0b1111) == C_MAP_LIGHT) {
+						if ((blk & 0b1111) == C_MAP_LIGHT_WALL) {
 							vec3_mulf(normal, 1.0f, v);
 							vec3_add(v, pos, v);
 
@@ -136,7 +183,7 @@ void c_map_load(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys) 
 				else 
 					vec3_set(tangent, 0.0f, 0.0f, 1.0f);
 
-				c_map_push_wall(&vertex, pos, normal, tangent, 0, 1);
+				c_map_push_wall(&vertex, pos, normal, tangent, uv[0], uv[1]);
 			}
 		}
 	}
@@ -167,7 +214,7 @@ void c_map_load(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys) 
 	g_phys_add_collider(phys, c_phys_ground_init(map->m, C_MAP_FLOOR, map->w, map->h, 0.0f));
 }
 
-void c_map_init(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys,
+void c_map_init(cmap_t* map, gscene_t* scene, grender_t* render, gdirector_t* director, gphys_t* phys,
 					unsigned char* pixels, int w, int h) {
 	int col;
 
@@ -195,7 +242,39 @@ void c_map_init(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys,
 				break;
 			
 			case 0xffff00:
-				map->m[i] = C_MAP_LIGHT | C_MAP_WALL | C_MAP_SOLID;
+				map->m[i] = C_MAP_LIGHT_WALL | C_MAP_WALL | C_MAP_SOLID;
+				break;
+			
+			case 0xffcc00:
+				map->m[i] = C_MAP_LIGHT_FLOOR | C_MAP_FLOOR;
+				break;
+			
+			case 0xff5b00:
+				map->m[i] = C_MAP_GHOST_ORB | C_MAP_FLOOR;
+				break;
+			
+			case 0xff00ff:
+				map->m[i] = C_MAP_GHOST_MAGE | C_MAP_FLOOR;
+				break;
+			
+			case 0xa7a7a7:
+				map->m[i] = C_MAP_GHOST_WARRIOR | C_MAP_FLOOR;
+				break;
+			
+			case 0x494949:
+				map->m[i] = C_MAP_GHOST_NECROMANCER | C_MAP_FLOOR;
+				break;
+			
+			case 0x0000ff:
+				map->m[i] = C_MAP_GHOST_REAPER;
+				break;
+			
+			case 0x00ffff:
+				map->m[i] = C_MAP_HEALTH | C_MAP_FLOOR;
+				break;
+			
+			case 0x00ff00:
+				map->m[i] = C_MAP_EXIT | C_MAP_FLOOR;
 				break;
 			
 			default:
@@ -209,5 +288,5 @@ void c_map_init(cmap_t* map, gscene_t* scene, grender_t* render, gphys_t* phys,
 	map->entity = g_scene_add_entity(scene);
 		map->entity->tag = C_MAP;
 
-		c_map_load(map, scene, render, phys);
+		c_map_load(map, scene, render, director, phys);
 }

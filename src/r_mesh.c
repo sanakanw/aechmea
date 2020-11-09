@@ -158,6 +158,17 @@ void r_draw_mesh(r_mesh_t r_mesh, int offset, int size) {
 	}
 }
 
+void r_mesh_reset(r_mesh_t ptr) {
+	mesh_t* mesh = &pool_mesh[ptr];
+
+	vram.index.ptr = mesh->ibo;
+	vram.vertex.ptr = mesh->vbo;
+
+	ptr_mesh = 0;
+
+	com_printf(LOG_DEBUG, "video: reset %i/%i", vram.vertex.ptr, vram.index.ptr);
+}
+
 int r_mesh_size(r_mesh_t r_mesh) {
 	mesh_t* mesh = &pool_mesh[r_mesh];
 	

@@ -50,4 +50,7 @@ void		g_render_light_update(grender_t* render, clight_t* light, vec3_t pos, vec4
 
 void		g_render_light_remove(grender_t* render, clight_t* light);
 
+
+void		g_render_update_dead(grender_t* render, int dead);
+
 #endif

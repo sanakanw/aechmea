@@ -6,19 +6,8 @@ layout(location = 2) in vec2 uv;
 
 out vec2 vs_uv;
 
-layout (std140) uniform block {
-	mat4	model;
-	mat4	transform;
-	
-	vec4	view_pos;
-	vec4	light_pos;
-	
-	float	ambience;
-};
-
 void main() {
 	vs_uv = uv;
 	
-	gl_Position	= transform * vec4(pos, 1.0);
-	
+	gl_Position	= vec4(pos, 1.0);
 }

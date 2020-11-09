@@ -5,11 +5,12 @@
 enum {
 	CBLOCK_MODEL		= 0,
 	CBLOCK_TRANSFORM	= 64,
-	CBLOCK_LIGHT		= 128,
+	CBLOCK_DEAD			= 128,
+	CBLOCK_LIGHT		= 144,
 } cblock_location_t;
 
 void g_render_init(grender_t* render, memhunk_t* hunk, int pool_size, int pool_light_size) {
-	int block_size = 128 + pool_light_size * sizeof(clight_t);
+	int block_size = 144 + pool_light_size * sizeof(clight_t);
 
 	int c = 0;
 	
@@ -98,4 +99,8 @@ void g_render_light_update(grender_t* render, clight_t* light, vec3_t pos, vec4_
 
 void g_render_attach_shader(grender_t* render, r_shader_t shader, const char* name) {
 	r_uniform_block(shader, name, render->vblk);
+}
+
+void g_render_update_dead(grender_t* render, int dead) {
+	r_block_sub_data(&dead, CBLOCK_DEAD, sizeof(int));
 }

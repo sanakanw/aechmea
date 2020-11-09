@@ -15,12 +15,12 @@ void asset_init(asset_t* asset, int mem) {
 asset_tex_t* asset_find_texture(asset_t* asset, const char* path) {
 	asset_tex_t* it = asset->list_tex;
 
-	do {
-		it = it->next;
-
+	while (it != NULL) {
 		if (strcmp(it->key, path) == 0)
 			return it;
-	} while (it != asset->list_tex);
+
+		it = it->next;
+	}
 
 	return NULL;
 }
@@ -28,12 +28,12 @@ asset_tex_t* asset_find_texture(asset_t* asset, const char* path) {
 asset_file_t* asset_find_file(asset_t* asset, const char* path) {
 	asset_file_t* it = asset->list_file;
 
-	do {
-		it = it->next;
-
+	while (it != NULL) {
 		if (strcmp(it->key, path) == 0)
-			return it; 
-	} while (it != asset->list_file);
+			return it;
+
+		it = it->next;
+	}
 
 	return NULL;
 }
@@ -69,13 +69,13 @@ asset_tex_t* asset_load_texture(asset_t* asset, const char* path) {
 		tex->h		= height;
 		tex->key	= path;
 	
-	if (!asset->list_tex)
+	if (!asset->list_tex) {
+		tex->next = NULL;
 		asset->list_tex = tex;
-	
-	tex->next = asset->list_tex;
-
-	asset->list_tex->next = tex;
-	asset->list_tex = tex;
+	} else {
+		tex->next = asset->list_tex;
+		asset->list_tex = tex;
+	}
 
 	memcpy(tex->pixels, data, size);
 	
@@ -100,19 +100,19 @@ asset_file_t* asset_load_file(asset_t* asset, const char* path) {
 		file->buffer = hunk_alloc(&asset->stack, length + 1);
 		file->key = path;
 
-	if (!asset->list_file)
-		asset->list_file = file;
-	
-	file->next = asset->list_file;
-	
-	asset->list_file->next = file;
-	asset->list_file = file;
 
 	fread(file->buffer, 1, length, fs);
-	
 	fclose(fs);
 
 	file->buffer[length] = '\0';
+
+	if (!asset->list_file) {
+		file->next = NULL;
+		asset->list_file = file;
+	} else {
+		file->next = asset->list_file;
+		asset->list_file = file;
+	}
 	
 	return file;
 }

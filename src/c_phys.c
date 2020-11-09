@@ -55,7 +55,7 @@ void c_phys_accelerate(cphys_t* pm, vec3_t wishdir, float accel, float wishspeed
 
 	float magnitude = vec3_length(pm->vel);
 
-	float max_vel = 8.0f;
+	float max_vel = 18.0f;
 
 	if (magnitude > max_vel) {
 		float cap = 1 - max_vel / magnitude;
@@ -64,6 +64,7 @@ void c_phys_accelerate(cphys_t* pm, vec3_t wishdir, float accel, float wishspeed
 
 		c_phys_add_force(pm, v);
 	}
+
 }
 
 void c_phys_impulse(cphys_t* rb, vec3_t v, float dt) {

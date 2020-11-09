@@ -22,9 +22,18 @@ void g_bullet_update(gbullet_t* bullet) {
 		if (pool_is_alloc(&bullet->pool, i)) {
 			b = pool_get(&bullet->pool, i);
 
+			if (b->type == C_BULLET_REAPER) {
+				quat_t q;
+				vec3_t up = { 0, 0, 1 };
+
+				quat_rotate(q, up, 0.5f);
+
+				quat_mul(b->entity->rot, q, b->entity->rot);
+			}
+
 			b->alive -= 1;
 
-			if (!b->alive || b->rb->clip_collision) {
+			if (!b->alive) {
 				g_scene_remove_entity(bullet->scene, b->entity);
 
 				return;
@@ -34,10 +43,17 @@ void g_bullet_update(gbullet_t* bullet) {
 				entity = b->rb->rigidbody_collision->entity;
 				tag = entity->tag;
 				
-				if (tag == C_GHOST) {
-					entity_id = entity - (gentity_t*) bullet->scene->pool.blk;
+				entity_id = g_scene_entity_id(bullet->scene, entity);
 
-					bullet->health->hp[entity_id] -= 0.1f;
+				if (tag == C_PLAYER && (b->type == C_BULLET_GHOST || b->type == C_BULLET_REAPER)) {
+					bullet->health->hp[entity_id] -= b->damage;
+
+					g_scene_remove_entity(bullet->scene, b->entity);
+				}
+				
+				if (tag == C_GHOST && b->type == C_BULLET_PLAYER) {
+					bullet->health->hp[entity_id] -= b->damage;
+
 					g_scene_remove_entity(bullet->scene, b->entity);
 				}
 			}
@@ -46,7 +62,7 @@ void g_bullet_update(gbullet_t* bullet) {
 }
 
 cbullet_t* g_bullet_add(gbullet_t* bullet, gentity_t* entity, vec3_t dt,
-							cbulletType_t type, float box, int alive) {
+							cbulletType_t type, float box, float damage, int alive) {
 	quat_t q;
 	vec3_t axis = { 1.0f, 0.0f, 0.0f };
 	
@@ -59,6 +75,7 @@ cbullet_t* g_bullet_add(gbullet_t* bullet, gentity_t* entity, vec3_t dt,
 		b->type = type;
 		b->alive = alive;
 		b->entity = entity;
+		b->damage = damage;
 
 		b->entity->tag = C_BULLET;
 		

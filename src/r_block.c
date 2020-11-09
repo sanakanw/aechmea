@@ -23,3 +23,11 @@ void r_bind_block(r_block_t block) {
 void r_block_sub_data(void* data, int offset, int size) {
 	glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
 }
+
+void r_block_reset(r_block_t ptr) {
+	for (int i = 0; i < ptr_block; i++) {
+		glDeleteBuffers(1, &pool_block[i]);
+	}
+
+	ptr_block = 0;
+}

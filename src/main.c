@@ -18,13 +18,17 @@ typedef enum {
 
 void load_assets(asset_t* asset) {
 	asset_load_mesh(asset, "asset/mesh/hand.obj");
-
+	asset_load_file(asset, "asset/shader/gui.pixel");
+	asset_load_file(asset, "asset/shader/gui.vertex");
 	asset_load_file(asset, "asset/shader/light.pixel");
-	
 	asset_load_file(asset, "asset/shader/light.vertex");
-
-	asset_load_texture(asset, "asset/tex/map.png");
-
+	asset_load_texture(asset, "asset/tex/map1.png");
+	asset_load_texture(asset, "asset/tex/map2.png");
+	asset_load_texture(asset, "asset/tex/map3.png");
+	asset_load_texture(asset, "asset/tex/map4.png");
+	asset_load_texture(asset, "asset/tex/map5.png");
+	asset_load_texture(asset, "asset/tex/map6.png");
+	asset_load_texture(asset, "asset/tex/map7.png");
 	asset_load_texture(asset, "asset/tex/sprites.png");
 }
 

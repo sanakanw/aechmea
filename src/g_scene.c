@@ -12,8 +12,8 @@ void g_scene_render(gscene_t* scene) {
 	scene->render(scene);
 }
 
-void g_scene_update(gscene_t* scene, int t) {
-	scene->update(scene, t);
+void g_scene_update(gscene_t* scene, asset_t* asset, int t) {
+	scene->update(scene, asset, t);
 }
 
 void g_scene_event(gscene_t* scene, in_event_t* event) {
@@ -40,4 +40,8 @@ void g_scene_remove_entity(gscene_t* scene, gentity_t* entity) {
 	scene->remove(scene, entity);
 
 	pool_remove(&scene->pool, entity - (gentity_t*) scene->pool.blk);
+}
+
+int g_scene_entity_id(gscene_t* scene, gentity_t* entity) {
+	return entity - (gentity_t*) scene->pool.blk;
 }
